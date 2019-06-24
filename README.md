@@ -14,14 +14,14 @@ on the INF1022 course, lectured by the professor Edward Hermann Haeusler.
 
 
 * Indent with 2 spaces (configurable on text editor)
-* Underscores may be added do improve readability
-* Functions names are lower case
+* Underscores may be added to improve readability
+* Function and variables names should be lower case
 
 ``` c
 double get_circumference (double radius);
 ```
 
-* Constants names are upper case
+* Constants names should be upper case
 
 ``` c
 #define PI 3.1415f
