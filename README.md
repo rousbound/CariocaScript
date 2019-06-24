@@ -1,4 +1,4 @@
-# Final Project for Lexical and Syntax Analysis (INF1022)
+# Final Project for Lexical and Syntactic Analysis
 
 This final project consists in using the **Flex/Bison (Lex/Yacc)** toolkit to generate compilers that,
 themselves, will generate code from an imperative language called **Provol-One**, to be executed in a Turing
