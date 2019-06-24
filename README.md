@@ -10,7 +10,7 @@ on the INF1022 course, lectured by the professor Edward Hermann Haeusler.
 
 *(Free translation from the project statement)*
 
-## Useful Links
+## Links
 
 * [Hermann](http://www-di.inf.puc-rio.br/~hermann/)
 * [Project statement (PDF)](http://www.tecmf.inf.puc-rio.br/INF1022?action=AttachFile&do=get&target=ProjetoFinal.pdf)
