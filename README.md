@@ -8,7 +8,7 @@ generated code, that can be aimed either for TMs with a single tape or for TMs w
 is totally up to the group to decide. In fact, the goal of this project is to apply the concepts learned
 on the INF1022 course, lectured by the professor Edward Hermann Haeusler.
 
-*(Free translation from the project statement)*
+*(Free translation from the project statement originally in Portuguese)*
 
 ## Links
 
