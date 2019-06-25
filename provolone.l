@@ -9,7 +9,8 @@
 [a-zA-Z0-9]+    { printf("Found a string: %s\n",yytext); }
 .               { printf("Found something else: %s\n",yytext); }
 %%
-int main(int argc, char** argv) {
-  // lex through the input:
+int main(int argc, char** argv)
+{
+  // For now, reading from STDIN
   while (yylex());
 }
