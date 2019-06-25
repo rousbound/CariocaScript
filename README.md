@@ -1,4 +1,4 @@
-# Final Project for Lexical and Syntactic Analysis
+# Compiler for JFLAP Turing Machine
 
 This final project consists in using the **Flex/Bison (Lex/Yacc)** toolkit to generate compilers that,
 themselves, will generate code from an imperative language called **Provol-One**, to be executed in a Turing
@@ -6,7 +6,7 @@ Machine. The TMs are generated according to a XML dialect that will be interpret
 application**. The macros contained in the XML file will work as a sort of runtime system to run the
 generated code, that can be aimed either for TMs with a single tape or for TMs with multiple tapes - it
 is totally up to the group to decide. In fact, the goal of this project is to apply the concepts learned
-on the INF1022 course, lectured by the professor Edward Hermann Haeusler.
+on the Lexical and Syntactic Analysis (INF1022) course, lectured by the professor Edward Hermann Haeusler.
 
 *(Free translation from the project statement originally in Portuguese)*
 
