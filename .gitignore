@@ -12,7 +12,8 @@
 *~
 
 # Flex-Bison
-lex.yy.c
+*.yy.c
+*.tab.*
 
 # Prerequisites
 *.d

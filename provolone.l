@@ -1,26 +1,25 @@
 %{
-  #include <stdio.h>
-  extern int yylex();
+  #include "provolone.tab.h"
+  int line_num = 1;
 %}
 %option noyywrap
 %%
-[ \t\n]         ;
-ENTRADA         { printf("Match: %s\n",yytext); }
-SAIDA           { printf("Match: %s\n",yytext); }
-FIM             { printf("Match: %s\n",yytext); }
-FACA            { printf("Match: %s\n",yytext); }
-VEZES           { printf("Match: %s\n",yytext); }
-SE              { printf("Match: %s\n",yytext); }
-ENTAO           { printf("Match: %s\n",yytext); }
-SENAO           { printf("Match: %s\n",yytext); }
-INC             { printf("Match: %s\n",yytext); }
-ZERA            { printf("Match: %s\n",yytext); }
-[0-9]+          { printf("Found an integer: %s\n",yytext); }
-[a-zA-Z0-9]+    { printf("Found a string: %s\n",yytext); }
+[ \t]         ;
+ENTRADA         { return ENTRADA; }
+SAIDA           { return SAIDA; }
+FIM             { return FIM; }
+FACA            { return FACA; }
+VEZES           { return VEZES; }
+ENQUANTO        { return ENQUANTO; }
+SE              { return SE; }
+ENTAO           { return ENTAO; }
+SENAO           { return SENAO; }
+INC             { return INC; }
+ZERA            { return ZERA; }
+[a-zA-Z]+       { yylval.sval = strdup(yytext); return STRING; }
+\(              { return OPEN_PAR; }
+\)              { return CLOSE_PAR; }
+\=              { return EQ; }
+\n              { ++line_num; }
 .               ;
 %%
-int main(int argc, char** argv)
-{
-  // For now, reading from STDIN
-  while (yylex());
-}

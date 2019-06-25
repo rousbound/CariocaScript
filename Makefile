@@ -1,13 +1,13 @@
 # Makefile
 # Guilherme Dantas
 
-all: provolone
-
 CFLAGS = -w
 
-provolone: provolone.l
+lex.yy.c: provolone.l provolone.tab.h
 	flex provolone.l
-	gcc lex.yy.c -o provolone
 
-#provolone.tab.c provolone.tab.h: provolone.y
-#	bison -d provolone.y
+provolone.tab.c provolone.tab.h: provolone.y
+	bison -d provolone.y -v
+
+provolone: lex.yy.c provolone.tab.c provolone.tab.h
+	gcc provolone.tab.c lex.yy.c -o provolone
