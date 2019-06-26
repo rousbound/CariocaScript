@@ -16,32 +16,29 @@ to the number of elements in the sequence, because all elements
 must be shifted onto the stack before the rule can be applied
 even once." <sup>(2)</sup>
 
-To solve the last is pretty trivial: simply swapping the terms
-turns it into left recursion, which is OK!
+To solve the last conflict is pretty trivial: simply swapping the
+terms turns it into left recursion, which is OK!
 
-But the DEP (Dangling ELSE Problem) cannot be easily fixed. We
-could rewrite the grammar to make it unambiguous, bit in this
-case, it wouldn't be that simple. Gladly, Bison provides us with
-the tools to define which rule has more priority over another.
-
-```
-%right ENTAO SENAO
-```
-
-What the code does is give the same precedence, but shifting
-the token SENAO wins, because it is making it right-associative.
-That way the parser will always try to identify the innermost
-if-statement, in a way that the following are equal:
+But to fix the DEP (Dangling ELSE Problem), there are two main
+ways: Either we rewrite the grammar to make it unambiguous, or
+use Bison tools to define which rule has more priority over another.
+We chose to change the grammar so that every IF statement ends
+with an END clause. So we went from this rule:
 
 ```
-SE X ENTAO SE Y ENTAO A SENAO B
+SE STRING ENTAO cmds SENAO cmds
+SE STRING ENTAO cmds
 ```
 
+To the following.
+
 ```
-SE X ENTAO
-  SE Y ENTAO A
-  SENAO B
+SE STRING ENTAO cmds SENAO cmds FIM
+SE STRING ENTAO cmds FIM
 ```
+
+That solves the SR conflict because when the parser cursor is after
+'cmds', there are two different shifts: SENAO and FIM.
 
 # Bibliography
 
