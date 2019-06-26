@@ -52,17 +52,17 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
   {
     printf("Program parsed.\n");
   };
-var_list: STRING var_list
+var_list: var_list STRING
   {
-    printf("Variable list parsed.\n");
+    printf("Variable parsed: %s.\n",$2);
   }
   | STRING
   {
-    printf("Variable list parsed.\n");
+    printf("Variable parsed: %s.\n",$1);
   };
-cmds: cmd cmds
+cmds: cmds cmd
   {
-    printf("Command parsed.\n");
+    printf("Commands parsed.\n");
   }
   | cmd
   {
@@ -70,31 +70,31 @@ cmds: cmd cmds
   };
 cmd: FACA STRING VEZES cmds FIM
   {
-    printf("For loop parsed.\n");
+    printf("For loop parsed (%s times).\n",$2);
   }
   | ENQUANTO STRING FACA cmds FIM
   {
-    printf("While loop parsed.\n");
+    printf("While loop parsed (while %s is true).\n",$2);
   }
-  | SE STRING ENTAO cmds SENAO cmds
+  | SE STRING ENTAO cmds SENAO cmds FIM
   {
-    printf("If else parsed.\n");
+    printf("If else parsed (if %s).\n",$2);
   }
-  | SE STRING ENTAO cmds
+  | SE STRING ENTAO cmds FIM
   {
-    printf("If parsed.\n");
+    printf("If parsed (if %s).\n",$2);
   }
   | STRING EQ STRING
   {
-    printf("Attribution parsed.\n");
+    printf("Attribution %s = %s parsed.\n",$1,$3);
   }
   | INC OPEN_PAR STRING CLOSE_PAR
   {
-    printf("Increment parsed.\n");
+    printf("Increment %s parsed.\n",$3);
   }
   | ZERA OPEN_PAR STRING CLOSE_PAR
   {
-    printf("Zero-ing parsed.\n");
+    printf("Zero-ing %s parsed.\n",$3);
   };
 %%
 
