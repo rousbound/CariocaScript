@@ -55,10 +55,15 @@ if( get_circumference(radius) == 0 ) exit(1);
 FILE * read_file (const char * file_name);
 ```
 
-## Links
+## Project Information
 
-* [Hermann](http://www-di.inf.puc-rio.br/~hermann/)
-* [Project statement](https://drive.google.com/file/d/185EW11LlP18a115te7fuPol0oz6TyTKs/view?usp=sharing)
-* [JFLAP](http://www.jflap.org/)
-* [Java](https://www.java.com/pt_BR/download/)
-* [Flex/Bison](https://aquamentus.com/flex_bison.html)
+* [Hermann *(Course Supervisor)*](http://www-di.inf.puc-rio.br/~hermann/)
+* [Statement *(in Portuguese)*](https://drive.google.com/file/d/185EW11LlP18a115te7fuPol0oz6TyTKs/view?usp=sharing)
+
+## Software Dependencies
+
+* [JFLAP *(Java Application)*](http://www.jflap.org/)
+* [Oracle Java](https://www.java.com/pt_BR/download/)
+* [Flex/Bison](https://aquamentus.com/flex_bison.html)<sup>1</sup>
+
+<sup>1</sup>Generally already included in POSIX operating systems
