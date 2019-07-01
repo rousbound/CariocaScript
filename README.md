@@ -48,15 +48,40 @@ read from standard input.
 
 ## Running tests
 
-The tests text files are located on the `tests` folder. You can run them
-by providing their path as an argument to the parser. As a stylistic choice,
-Provol-One scripts are labelled with the .p1 extension. For example:
+You can test the parser by running the program over a sample script. These test
+files are located on the `tests` folder. You can run them by providing their path
+as an argument to the parser. As a stylistic choice, Provol-One scripts are labelled
+with the .p1 extension. For example:
 
 ``` bash
 $ ./bin/provolone tests/simple.p1
 ```
 
-This should output:
+So the following script...
+
+```
+ENTRADA X, Y
+SAIDA Z
+SE X ENTAO
+  SE Y ENTAO
+    INC(X)
+  FIM
+SENAO
+  INC(Y)
+FIM
+FACA X VEZES
+  INC(Z)
+FIM
+ZERA(X)
+ENQUANTO Z FACA
+  SE X ENTAO
+    INC(X)
+  FIM
+  X = Y
+FIM
+FIM
+```
+...should output:
 
 ```
 Variable parsed: X.
