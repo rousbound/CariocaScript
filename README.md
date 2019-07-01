@@ -13,24 +13,26 @@ on the Lexical and Syntactic Analysis (INF1022) course, lectured by the professo
 ## Getting Started
 
 In order to have of the project running on your machine, you must install the **Flex** and **Bison** packages.
-Also, you might want to install **JDK** in order to run the JFLAP application.
+Also, you might want to install **JDK** in order to run the JFLAP application. For the following installations,
+you'll be prompted with a y/N question - answer with 'y', for yes.
 
 ``` bash
-sudo yum install flex.x86_64
-sudo yum install bison.x86_64
-sudo yum install java-1.8.0-openjdk
+$ sudo yum install flex.x86_64
+$ sudo yum install bison.x86_64
+$ sudo yum install java-1.8.0-openjdk
 ```
 
-Then you can easily compile the code by making use of the Makefile.
+Then you can easily compile the code by making use of the Makefile that resides on the `src` folder.
 
 ``` bash
-make
+$ cd src
+$ make
 ```
 
 In order to launch the JFLAP application, simply run:
 
 ``` bash
-java -jar JFLAPX.X.jar
+$ java -jar JFLAPX.X.jar
 ```
 
 ## Running the parser/compiler
@@ -38,7 +40,7 @@ java -jar JFLAPX.X.jar
 From the repository root, you may run the parser/compiler as follows:
 
 ``` bash
-./bin/provolone [file]
+$ ./bin/provolone [file]
 ```
 
 The argument is optional. If no argument is given, the parser will simply
@@ -51,7 +53,7 @@ by providing their path as an argument to the parser. As a stylistic choice,
 Provol-One scripts are labelled with the .p1 extension. For example:
 
 ``` bash
-./bin/provolone txt/simple.p1
+$ ./bin/provolone txt/simple.p1
 ```
 
 This should output:
