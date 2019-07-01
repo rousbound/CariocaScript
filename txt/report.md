@@ -19,11 +19,12 @@ even once." <sup>(2)</sup>
 To solve the last conflict is pretty trivial: simply swapping the
 terms turns it into left recursion, which is OK!
 
-But to fix the DEP (Dangling ELSE Problem), there are two main
+But to fix the DEP (Dangling ELSE Problem)<sup>(3)</sup>, there are two main
 ways: Either we rewrite the grammar to make it unambiguous, or
-use Bison tools to define which rule has more priority over another.
+use Bison tools to define which rule has more priority over the other.
 We chose to change the grammar so that every IF statement ends
-with an END clause. So we went from this rule:
+with an END clause, just like every WHILE, FOR and PROGRAM statemtent.
+So we went from this rule:
 
 ```
 SE STRING ENTAO cmds SENAO cmds
