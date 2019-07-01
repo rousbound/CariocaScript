@@ -1,15 +1,8 @@
-# UNIX Binaries
-*
-!*.*
+# Binaries
+bin/
 
-# C Makefile
-!*Makefile
-
-# Git file
-!*LICENSE
-
-# Backup files
-*~
+# Java applications
+*.jar
 
 # Flex-Bison
 *.yy.c
