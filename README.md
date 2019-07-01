@@ -10,8 +10,22 @@ on the Lexical and Syntactic Analysis (INF1022) course, lectured by the professo
 
 *(Free translation from the project statement originally in Portuguese)*
 
-## Code Style Standard
+## Getting Started
 
+In order to have of the project running on your machine, you must install the **Flex** and **Bison** packages.
+
+``` bash
+sudo yum install flex.x86_64
+sudo yum install bison.x86_64
+```
+
+Then you can easily compile the code by making use of the Makefile.
+
+``` bash
+make
+```
+
+## Code Style Standard
 
 * Indent with 2 spaces (configurable on text editor)
 * Underscores may be added to improve readability
@@ -64,6 +78,3 @@ FILE * read_file (const char * file_name);
 
 * [JFLAP *(Java Application)*](http://www.jflap.org/)
 * [Oracle Java](https://www.java.com/pt_BR/download/)
-* [Flex/Bison](https://aquamentus.com/flex_bison.html)<sup>1</sup>
-
-<sup>1</sup>Generally already included in POSIX operating systems
