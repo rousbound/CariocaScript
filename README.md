@@ -53,7 +53,7 @@ by providing their path as an argument to the parser. As a stylistic choice,
 Provol-One scripts are labelled with the .p1 extension. For example:
 
 ``` bash
-$ ./bin/provolone txt/simple.p1
+$ ./bin/provolone tests/simple.p1
 ```
 
 This should output:
