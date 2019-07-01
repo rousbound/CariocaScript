@@ -35,7 +35,7 @@ In order to launch the JFLAP application, simply run:
 $ java -jar JFLAPX.X.jar
 ```
 
-## Running the parser/compiler
+### Running the parser/compiler
 
 From the repository root, you may run the parser/compiler as follows:
 
@@ -46,7 +46,7 @@ $ ./bin/provolone [file]
 The argument is optional. If no argument is given, the parser will simply
 read from standard input.
 
-## Running tests
+### Running tests
 
 You can test the parser by running the program over a sample script. These test
 files are located on the `tests` folder. You can run them by providing their path
