@@ -1,9 +1,9 @@
 # Final Project Report
 
 Group members:
-- *Felipe Ferreira*
-- *Guilherme Dantas*
-- *Roberto*
+- *Felipe Vieira Ferreira*
+- *Guilherme Dantas de Oliveira*
+- *Roberto Mario Lemos Teran Luna*
 
 ## Shift/Reduce Conflicts
 
