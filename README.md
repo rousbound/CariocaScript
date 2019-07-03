@@ -10,6 +10,15 @@ on the Lexical and Syntactic Analysis (INF1022) course, lectured by the professo
 
 *(Free translation from the project statement originally in Portuguese)*
 
+## Sections
+
+- [Getting Started](#getting-started)
+  - [Running the parser/compiler](#running-the-parsercompiler)
+  - [Running tests](#running-tests)
+- [Code Style Standard](#code-style-standard)
+- [Project Information](#project-information)
+- [Software Dependecies](#software-dependencies)
+
 ## Getting Started
 
 In order to have of the project running on your machine, you must install the **Flex** and **Bison** packages.
