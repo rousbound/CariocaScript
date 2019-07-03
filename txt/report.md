@@ -41,8 +41,31 @@ SE STRING ENTAO cmds FIM
 That solves the SR conflict because when the parser cursor is after
 'cmds', there are two different shifts: SENAO and FIM.
 
+## Code Generation
+
+Since JFLAP Mulit-tape Turing Machine has the limit of **five tapes**, our
+program will be limited to having a maximum of four variables (input and output)
+- one tape for each. The remaining tape will be used to store the loops counter.
+
+Thankfully, Hermann has provided the Turing Machines for each operation used
+in the Provol-One language. They are described by a XML file with the '.jff' extension.
+
+Each command will correspond to a Building Block, that always contains one initial
+state and one final state (that, differently from the main final state, will not
+interrupt the TM - but instead, will exit the Building Block scope).<sup>(4)</sup>
+
+In the XML, the building blocks are specified with `<block>` and inside it, `<tag>`
+will specify the block tag. Later on, the block id defined by the tags in `<tag>id</tag>`
+will be declared as `<id>...</id>` on the same scope as the `<block>` tag.<sup>(5)</sup>
+
+That way, we can define each command at the end of the program and simply call the
+building block whenever a command is found. But the real challenge will be to
+deal with loop commands like `ENQUANTO` and `FACA`.
+
 # Bibliography
 
 1. [Shift/Reduce](https://www.gnu.org/software/bison/manual/html_node/Shift_002fReduce.html)
 2. [Recursive Rules](https://www.gnu.org/software/bison/manual/html_node/Recursion.html)
 3. [Dangling Else Solution](https://stackoverflow.com/a/12734499)
+4. [JFLAP TM Building Blocks](http://www.jflap.org/tutorial/turing/buildingblocks/buildingblocks.htm)
+5. [JFLAP TM Building Blocks Examples](http://www.jflap.org/jflapfiles/TMBBexamples/)
