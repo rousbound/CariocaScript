@@ -1,6 +1,7 @@
 %{
   #include <stdio.h>
   #include <stdlib.h>
+  #include <string.h>
   #include "colours.h"
 
   // Declare stuff from Flex that Bison needs to know about:
@@ -24,6 +25,7 @@
 // mechanism with the %union directive:
 %union {
   int ival;
+  char * sval;
 }
 
 // define the constant-string tokens:
@@ -42,9 +44,14 @@
 %token CLOSE_PAR
 %token EQ
 
-// Define the "terminal symbol" token types I'm going to use (in CAPS
-// by convention), and associate each with a field of the %union:
+// Define the "terminal symbol" token types and associate each with a field of the %union:
 %token <ival> ID
+
+// Define the "non-terminal symbols" types and associate each with a field of the %union:
+%type <sval> program
+%type <sval> var_list
+%type <sval> cmds
+%type <sval> cmd
 
 %%
 // This is the actual grammar that bison will parse, but for right now it's just
