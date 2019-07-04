@@ -31,14 +31,23 @@ $ sudo yum install bison.x86_64
 $ sudo yum install java-1.8.0-openjdk
 ```
 
-Then you can easily compile the code by making use of the Makefile that resides on the `src` folder.
+Then you can easily compile the code by making use of the build script, which will also run the simple test to
+make sure the compiler is working fine, if the `file` argument isn't provided.
+
+``` bash
+$ chmod +x build.sh
+$ ./build.sh [file]
+```
+
+Or, if you preffer, simply run the Makefile on the `src` folder which will do pretty much the same thing but
+run the simple test.
 
 ``` bash
 $ cd src
 $ make
 ```
 
-In order to launch the JFLAP application, simply run:
+**Reminder:** In order to launch the JFLAP application, simply run:
 
 ``` bash
 $ java -jar JFLAPX.X.jar
