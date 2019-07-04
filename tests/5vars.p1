@@ -1,3 +1,4 @@
 ENTRADA X, Y, W, K, L
 SAIDA Z
+INC(Z)
 FIM

@@ -1,6 +1,7 @@
 %{
   #include <stdio.h>
   #include <stdlib.h>
+  #include "colours.h"
 
   // Declare stuff from Flex that Bison needs to know about:
   extern int yylex();
@@ -10,6 +11,7 @@
   extern int line_num;
 
   void yyerror(const char *s);
+  int symtab_size = 0;
 %}
 
 // Bison fundamentally works by asking flex to get the next token, which it
@@ -54,11 +56,29 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
   };
 var_list: var_list ID
   {
-    printf("Variable parsed: %d.\n",$2);
+    if( $2 == -1 )
+    {
+      yyerror("symbol table overflow");
+      YYERROR;
+    }
+    else
+    {
+      printf("Variable parsed: %d.\n",$2);
+      symtab_size++;
+    }
   }
   | ID
   {
-    printf("Variable parsed: %d.\n",$1);
+    if( $1 == -1 )
+    {
+      yyerror("symbol table overflow");
+      YYERROR;
+    }
+    else
+    {
+      printf("Variable parsed: %d.\n",$1);
+      symtab_size++;
+    }
   };
 cmds: cmds cmd
   {
@@ -70,31 +90,87 @@ cmds: cmds cmd
   };
 cmd: FACA ID VEZES cmds FIM
   {
-    printf("For loop parsed (%d times).\n",$2);
+    if( $2 >= symtab_size )
+    {
+      yyerror("undeclared symbol");
+      YYERROR;
+    }
+    else
+    {
+      printf("For loop parsed (%d times).\n",$2);
+    }
   }
   | ENQUANTO ID FACA cmds FIM
   {
-    printf("While loop parsed (while %d is true).\n",$2);
+    if( $2 >= symtab_size )
+    {
+      yyerror("undeclared symbol");
+      YYERROR;
+    }
+    else
+    {
+      printf("While loop parsed (while %d is true).\n",$2);
+    }
   }
   | SE ID ENTAO cmds SENAO cmds FIM
   {
-    printf("If else parsed (if %d).\n",$2);
+    if( $2 >= symtab_size )
+    {
+      yyerror("undeclared symbol");
+      YYERROR;
+    }
+    else
+    {
+      printf("If else parsed (if %d).\n",$2);
+    }
   }
   | SE ID ENTAO cmds FIM
   {
-    printf("If parsed (if %d).\n",$2);
+    if( $2 >= symtab_size )
+    {
+      yyerror("undeclared symbol");
+      YYERROR;
+    }
+    else
+    {
+      printf("If parsed (if %d).\n",$2);
+    }
   }
   | ID EQ ID
   {
-    printf("Attribution %d = %d parsed.\n",$1,$3);
+    if( $1 >= symtab_size ||  $3 >= symtab_size )
+    {
+      yyerror("undeclared symbol");
+      YYERROR;
+    }
+    else
+    {
+      printf("Attribution %d = %d parsed.\n",$1,$3);
+    }
   }
   | INC OPEN_PAR ID CLOSE_PAR
   {
-    printf("Increment %d parsed.\n",$3);
+    if( $3 >= symtab_size )
+    {
+      yyerror("undeclared symbol");
+      YYERROR;
+    }
+    else
+    {
+      printf("Increment %d parsed.\n",$3);
+    }
   }
   | ZERA OPEN_PAR ID CLOSE_PAR
   {
-    printf("Zero-ing %d parsed.\n",$3);
+    if( $3 >= symtab_size )
+    {
+      yyerror("undeclared symbol");
+      YYERROR;
+    }
+    else
+    {
+      printf("Zero-ing %d parsed.\n",$3);
+    }
   };
 %%
 
@@ -124,7 +200,7 @@ int main(int argc, char** argv) {
 }
 
 void yyerror(const char *s) {
+  printf(BOLD_CYAN);
   printf("Parsing error at line %d: '%s'\n",line_num,s);
-  // might as well halt now:
-  exit(-1);
+  printf(DEFAULT_COLOUR);
 }

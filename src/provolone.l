@@ -1,16 +1,14 @@
 %{
   #include <string.h>
   #include "provolone.tab.h"
-  #include "utils.h"
-  #include "colours.h"
 
   #define MAX_VAR_CNT 4
 
   extern void yyerror(const char *s);
+  extern int symtab_size;
 
   char * symtab[MAX_VAR_CNT];
   int line_num = 1;
-  int var_cnt = 0;
 %}
 %option noyywrap
 %%
@@ -27,7 +25,7 @@ SENAO           { return SENAO; }
 INC             { return INC; }
 ZERA            { return ZERA; }
 [a-zA-Z]+       {
-  for( int i = 0 ; i < var_cnt ; i++ )
+  for( int i = 0 ; i < symtab_size ; i++ )
   {
     if( !strcmp(symtab[i],yytext) )
     {
@@ -35,16 +33,14 @@ ZERA            { return ZERA; }
       return ID;
     }
   }
-  if( var_cnt == MAX_VAR_CNT )
+  if( symtab_size == MAX_VAR_CNT )
   {
-    yyerror("Exceeded limit of variables on Symbol Table.");
     yylval.ival = -1; // Error!
   }
   else
   {
-    symtab[var_cnt] = strdup(yytext);
-    yylval.ival = var_cnt;
-    var_cnt++;
+    symtab[symtab_size] = strdup(yytext);
+    yylval.ival = symtab_size;
   }
   return ID;
 }
@@ -56,5 +52,5 @@ ZERA            { return ZERA; }
 %%
 void free_symtab()
 {
-  for(int i = 0; i < var_cnt; i++) free(symtab[i]);
+  for(int i = 0; i < symtab_size; i++) free(symtab[i]);
 }

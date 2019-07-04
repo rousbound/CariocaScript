@@ -11,17 +11,14 @@ setup: $(BINFLDR)
 $(BINFLDR):
 	mkdir -p $(BINFLDR)
 
-lex.yy.c: provolone.l provolone.tab.h utils.h colours.h
+lex.yy.c: provolone.l provolone.tab.h
 	flex provolone.l
 
-provolone.tab.c provolone.tab.h: provolone.y
+provolone.tab.c provolone.tab.h: provolone.y colours.h
 	bison -d provolone.y
 
-$(BINFLDR)/provolone: lex.yy.c provolone.tab.c provolone.tab.h utils.o
-	gcc provolone.tab.c lex.yy.c utils.o -o $(BINFLDR)/provolone
-
-utils.o: utils.c utils.h colours.h
-	gcc utils.c -o utils.o -c
+$(BINFLDR)/provolone: lex.yy.c provolone.tab.c provolone.tab.h
+	gcc provolone.tab.c lex.yy.c -o $(BINFLDR)/provolone
 
 clean: clear
 
