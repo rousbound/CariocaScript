@@ -5,9 +5,10 @@
   // Declare stuff from Flex that Bison needs to know about:
   extern int yylex();
   extern int yyparse();
+  extern void free_symtab();
   extern FILE *yyin;
   extern int line_num;
- 
+
   void yyerror(const char *s);
 %}
 
@@ -21,20 +22,19 @@
 // mechanism with the %union directive:
 %union {
   int ival;
-  char *sval;
 }
 
 // define the constant-string tokens:
-%token ENTRADA 
-%token SAIDA 
-%token FIM 
-%token FACA 
-%token VEZES 
-%token ENQUANTO 
-%token SE 
-%token ENTAO 
-%token SENAO 
-%token INC 
+%token ENTRADA
+%token SAIDA
+%token FIM
+%token FACA
+%token VEZES
+%token ENQUANTO
+%token SE
+%token ENTAO
+%token SENAO
+%token INC
 %token ZERA
 %token OPEN_PAR
 %token CLOSE_PAR
@@ -42,7 +42,7 @@
 
 // Define the "terminal symbol" token types I'm going to use (in CAPS
 // by convention), and associate each with a field of the %union:
-%token <sval> STRING
+%token <ival> ID
 
 %%
 // This is the actual grammar that bison will parse, but for right now it's just
@@ -52,13 +52,13 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
   {
     printf("Program parsed.\n");
   };
-var_list: var_list STRING
+var_list: var_list ID
   {
-    printf("Variable parsed: %s.\n",$2);
+    printf("Variable parsed: %d.\n",$2);
   }
-  | STRING
+  | ID
   {
-    printf("Variable parsed: %s.\n",$1);
+    printf("Variable parsed: %d.\n",$1);
   };
 cmds: cmds cmd
   {
@@ -68,39 +68,39 @@ cmds: cmds cmd
   {
     printf("Command parsed.\n");
   };
-cmd: FACA STRING VEZES cmds FIM
+cmd: FACA ID VEZES cmds FIM
   {
-    printf("For loop parsed (%s times).\n",$2);
+    printf("For loop parsed (%d times).\n",$2);
   }
-  | ENQUANTO STRING FACA cmds FIM
+  | ENQUANTO ID FACA cmds FIM
   {
-    printf("While loop parsed (while %s is true).\n",$2);
+    printf("While loop parsed (while %d is true).\n",$2);
   }
-  | SE STRING ENTAO cmds SENAO cmds FIM
+  | SE ID ENTAO cmds SENAO cmds FIM
   {
-    printf("If else parsed (if %s).\n",$2);
+    printf("If else parsed (if %d).\n",$2);
   }
-  | SE STRING ENTAO cmds FIM
+  | SE ID ENTAO cmds FIM
   {
-    printf("If parsed (if %s).\n",$2);
+    printf("If parsed (if %d).\n",$2);
   }
-  | STRING EQ STRING
+  | ID EQ ID
   {
-    printf("Attribution %s = %s parsed.\n",$1,$3);
+    printf("Attribution %d = %d parsed.\n",$1,$3);
   }
-  | INC OPEN_PAR STRING CLOSE_PAR
+  | INC OPEN_PAR ID CLOSE_PAR
   {
-    printf("Increment %s parsed.\n",$3);
+    printf("Increment %d parsed.\n",$3);
   }
-  | ZERA OPEN_PAR STRING CLOSE_PAR
+  | ZERA OPEN_PAR ID CLOSE_PAR
   {
-    printf("Zero-ing %s parsed.\n",$3);
+    printf("Zero-ing %d parsed.\n",$3);
   };
 %%
 
 int main(int argc, char** argv) {
   if( argc > 1 )
-  { 
+  {
     char * file_path = argv[1];
     // Open a file handle to a particular file:
     FILE *input_file = fopen(file_path, "r");
@@ -116,9 +116,11 @@ int main(int argc, char** argv) {
   {
     // Reading from STDIN
   }
-  
+
   // Parse through the input:
   yyparse();
+  // Free Symbol Table
+  free_symtab();
 }
 
 void yyerror(const char *s) {
