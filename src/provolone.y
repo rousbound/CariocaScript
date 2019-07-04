@@ -54,6 +54,7 @@
 // Define the "non-terminal symbols" types and associate each with a field of the %union:
 %type <sval> program
 %type <sval> var_list
+%type <sval> var
 %type <sval> cmds
 %type <sval> cmd
 
@@ -83,33 +84,21 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
     free(s_entrada); free($2); free(s_saida); free($4); /*free($5);*/ free(s_fim);
     printf("%s\n",$$);
   };
-var_list: var_list ID
+var_list: var_list var
   {
-    if( $2 == -1 )
+    $$ = concat($1,$2);
+    if( !$$ )
     {
-      yyerror(OVFLW_ERROR);
+      yyerror(MEM_ERROR);
       YYERROR;
     }
-    else
-    {
-      char * s_id = (char *) malloc(sizeof(char)*32);
-      if( !s_id )
-      {
-        yyerror(MEM_ERROR);
-        YYERROR;
-      }
-      sprintf(s_id,"Variable parsed: %d.\n",$2);
-      $$ = concat($1,s_id);
-      if( !$$ )
-      {
-        yyerror(MEM_ERROR);
-        YYERROR;
-      }
-      free($1); free(s_id);
-      symtab_size++;
-    }
+    free($1); free($2);
   }
-  | ID
+  | var
+  {
+    $$ = $1; // simply pass the pointer
+  };
+var: ID
   {
     if( $1 == -1 )
     {
@@ -128,14 +117,20 @@ var_list: var_list ID
       $$ = s_id;
       symtab_size++;
     }
-  };
+  }
 cmds: cmds cmd
   {
-    // printf("Commands parsed.\n");
+    // $$ = concat($1,$2);
+    // if( !$$ )
+    // {
+    //   yyerror(MEM_ERROR);
+    //   YYERROR;
+    // }
+    // free($1); free($2);
   }
   | cmd
   {
-    // printf("Command parsed.\n");
+    // $$ = $1; // simply pass the pointer
   };
 cmd: FACA ID VEZES cmds FIM
   {
