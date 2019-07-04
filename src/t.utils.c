@@ -11,8 +11,8 @@
 
     // dynamically allocated strings
     // -- works!
-    char * a = (char *) malloc(6);
-    char * b = (char *) malloc(6);
+    char * a = (char *) malloc(sizeof(char)*6);
+    char * b = (char *) malloc(sizeof(char)*6);
     fatal_assert(a); fatal_assert(b);
     strcpy(a,"algo "); strcpy(b,"assim");
     char * c = concat(a,b);
@@ -28,8 +28,8 @@
     free(d);
 
     // EPSILON TESTS
-    char * e = (char *) malloc(2);
-    char * f = (char *) malloc(2);
+    char * e = (char *) malloc(sizeof(char)*2);
+    char * f = (char *) malloc(sizeof(char)*2);
     fatal_assert(e); fatal_assert(f);
     strcpy(e,"a"); strcpy(f,"");
 
