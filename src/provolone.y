@@ -3,6 +3,10 @@
   #include <stdlib.h>
   #include <string.h>
   #include "colours.h"
+  #include "utils.h"
+
+  #define OVFLW_ERROR "symbol table overflow"
+  #define MEM_ERROR "could not allocate memory"
 
   // Declare stuff from Flex that Bison needs to know about:
   extern int yylex();
@@ -59,18 +63,49 @@
 // make a real one shortly:
 program: ENTRADA var_list SAIDA var_list cmds FIM
   {
-    printf("Program parsed.\n");
+    char * s_entrada = (char *) malloc(sizeof(char)*32);
+    char * s_saida = (char *) malloc(sizeof(char)*32);
+    char * s_fim = (char *) malloc(sizeof(char)*16);
+    if( !s_entrada || !s_saida || !s_fim )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    sprintf(s_entrada,"Loaded variables as input:\n");
+    sprintf(s_saida,"Loaded variables as output:\n");
+    sprintf(s_fim,"End of program.");
+    $$ = concat(s_entrada, $2, s_saida, $4, /*$5,*/ s_fim);
+    if( !$$ )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    free(s_entrada); free($2); free(s_saida); free($4); /*free($5);*/ free(s_fim);
+    printf("%s\n",$$);
   };
 var_list: var_list ID
   {
     if( $2 == -1 )
     {
-      yyerror("symbol table overflow");
+      yyerror(OVFLW_ERROR);
       YYERROR;
     }
     else
     {
-      printf("Variable parsed: %d.\n",$2);
+      char * s_id = (char *) malloc(sizeof(char)*32);
+      if( !s_id )
+      {
+        yyerror(MEM_ERROR);
+        YYERROR;
+      }
+      sprintf(s_id,"Variable parsed: %d.\n",$2);
+      $$ = concat($1,s_id);
+      if( !$$ )
+      {
+        yyerror(MEM_ERROR);
+        YYERROR;
+      }
+      free($1); free(s_id);
       symtab_size++;
     }
   }
@@ -78,22 +113,29 @@ var_list: var_list ID
   {
     if( $1 == -1 )
     {
-      yyerror("symbol table overflow");
+      yyerror(OVFLW_ERROR);
       YYERROR;
     }
     else
     {
-      printf("Variable parsed: %d.\n",$1);
+      char * s_id = (char *) malloc(sizeof(char)*32);
+      if( !s_id )
+      {
+        yyerror(MEM_ERROR);
+        YYERROR;
+      }
+      sprintf(s_id,"Variable parsed: %d.\n",$1);
+      $$ = s_id;
       symtab_size++;
     }
   };
 cmds: cmds cmd
   {
-    printf("Commands parsed.\n");
+    // printf("Commands parsed.\n");
   }
   | cmd
   {
-    printf("Command parsed.\n");
+    // printf("Command parsed.\n");
   };
 cmd: FACA ID VEZES cmds FIM
   {
@@ -104,7 +146,7 @@ cmd: FACA ID VEZES cmds FIM
     }
     else
     {
-      printf("For loop parsed (%d times).\n",$2);
+      // printf("For loop parsed (%d times).\n",$2);
     }
   }
   | ENQUANTO ID FACA cmds FIM
@@ -116,7 +158,7 @@ cmd: FACA ID VEZES cmds FIM
     }
     else
     {
-      printf("While loop parsed (while %d is true).\n",$2);
+      // printf("While loop parsed (while %d is true).\n",$2);
     }
   }
   | SE ID ENTAO cmds SENAO cmds FIM
@@ -128,7 +170,7 @@ cmd: FACA ID VEZES cmds FIM
     }
     else
     {
-      printf("If else parsed (if %d).\n",$2);
+      // printf("If else parsed (if %d).\n",$2);
     }
   }
   | SE ID ENTAO cmds FIM
@@ -140,7 +182,7 @@ cmd: FACA ID VEZES cmds FIM
     }
     else
     {
-      printf("If parsed (if %d).\n",$2);
+      // printf("If parsed (if %d).\n",$2);
     }
   }
   | ID EQ ID
@@ -152,7 +194,7 @@ cmd: FACA ID VEZES cmds FIM
     }
     else
     {
-      printf("Attribution %d = %d parsed.\n",$1,$3);
+      // printf("Attribution %d = %d parsed.\n",$1,$3);
     }
   }
   | INC OPEN_PAR ID CLOSE_PAR
@@ -164,7 +206,7 @@ cmd: FACA ID VEZES cmds FIM
     }
     else
     {
-      printf("Increment %d parsed.\n",$3);
+      // printf("Increment %d parsed.\n",$3);
     }
   }
   | ZERA OPEN_PAR ID CLOSE_PAR
@@ -176,7 +218,7 @@ cmd: FACA ID VEZES cmds FIM
     }
     else
     {
-      printf("Zero-ing %d parsed.\n",$3);
+      // printf("Zero-ing %d parsed.\n",$3);
     }
   };
 %%
