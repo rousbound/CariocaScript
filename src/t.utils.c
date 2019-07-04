@@ -14,8 +14,7 @@
     char * a = (char *) malloc(6);
     char * b = (char *) malloc(6);
     fatal_assert(a); fatal_assert(b);
-    strcpy(a,"algo ");
-    strcpy(b,"assim");
+    strcpy(a,"algo "); strcpy(b,"assim");
     char * c = concat(a,b);
     fatal_assert(c);
     assert(strcmp(c,"algo assim")==0);
@@ -23,10 +22,34 @@
 
     // const strings (not dynamically allocated)
     // -- does not work!
-    char * f = concat("do ","tipo");
-    fatal_assert(f);
-    assert(strcmp(f,"do tipo")!=0);
-    free(f);
+    char * d = concat("do ","tipo");
+    fatal_assert(d);
+    assert(strcmp(d,"do tipo")!=0);
+    free(d);
+
+    // EPSILON TESTS
+    char * e = (char *) malloc(2);
+    char * f = (char *) malloc(2);
+    fatal_assert(e); fatal_assert(f);
+    strcpy(e,"a"); strcpy(f,"");
+
+    // a + epsilon = a
+    char * g = concat(e,f);
+    fatal_assert(g);
+    assert(strcmp(g,e)==0);
+    free(g);
+
+    // epsilon + a = a
+    g = concat(f,e);
+    fatal_assert(g);
+    assert(strcmp(g,e)==0);
+    free(g);
+
+    // epsilon + epsilon = epsilon
+    g = concat(f,f);
+    fatal_assert(g);
+    assert(strcmp(g,f)==0);
+    free(g);
 
     show_log();
     return 0;
