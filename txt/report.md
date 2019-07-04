@@ -81,8 +81,8 @@ will also hold up to 4 symbols*. The algorithm works as follows: every time the 
 the regular expression for `id`, it will look for a symbol of same string on the symbol table.
 If found, its index in the symbol table is returned. If not, it checks whether there is room
 for a new symbol definition (`#syms < 4`). If there isn't (full symbol table), an error is thrown
-and the program is interrupted. Else, the new symbol table entry is registered, the `#syms` counter
-is incremented, and the new symbol index is returned.
+by the `yyerror` bison routine<sup>(6)</sup> and the program is interrupted. Else, the new symbol
+table entry is registered, the `#syms` counter is incremented, and the new symbol index is returned.
 
 Also, to avoid memory leak, a routine has to be called after `yyparse` to free the allocated
 symbols on the symbol table. It is called on the `main` function (on `.y`), externed from the
@@ -95,3 +95,4 @@ symbols on the symbol table. It is called on the `main` function (on `.y`), exte
 3. [Dangling Else Solution](https://stackoverflow.com/a/12734499)
 4. [JFLAP TM Building Blocks](http://www.jflap.org/tutorial/turing/buildingblocks/buildingblocks.htm)
 5. [JFLAP TM Building Blocks Examples](http://www.jflap.org/jflapfiles/TMBBexamples/)
+6. [Error Reporting in Bison](https://www.gnu.org/software/bison/manual/html_node/Error-Reporting.html)
