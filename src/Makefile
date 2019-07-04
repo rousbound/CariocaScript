@@ -25,11 +25,14 @@ $(BINFLDR)/provolone: lex.yy.c provolone.tab.c provolone.tab.h
 utils.o: utils.c utils.h
 	gcc -c utils.c -o utils.o $(CFLAGS)
 
-t.utils.o: t.utils.c utils.h
+t.utils.o: t.utils.c utils.h test.h
 	gcc -c t.utils.c -o t.utils.o $(CFLAGS)
 
-$(BINFLDR)/t.utils: t.utils.o utils.o
-	gcc utils.o t.utils.o -o $(BINFLDR)/t.utils $(CFLAGS)
+test.o: test.c test.h
+	gcc -c test.c -o test.o $(CFLAGS)
+
+$(BINFLDR)/t.utils: t.utils.o utils.o test.o
+	gcc utils.o t.utils.o test.o -o $(BINFLDR)/t.utils $(CFLAGS)
 
 clean: clear
 

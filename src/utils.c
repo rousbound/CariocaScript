@@ -8,23 +8,13 @@
   #include <string.h>
   #include "utils.h"
 
-  char * concat(int n, ...) {
-    va_list va; int size = 1;
-    // Get concatenated string size
-    va_start(va,n);
-    for(int i = 0; i < n; i++) {
-      char * si = va_arg(va,char *);
-      if( si == NULL ) continue;
-      size += strlen(si);
-    } va_end(va);
-    // Concatenate each string
-    va_start(va,n);
+  char * concatfunc(char * dummy, ...)
+  {
+    va_list va; int size = 1; char * si; va_start(va,dummy);
+    while( (si=va_arg(va,char *)) != NULL ) size += strlen(si);
+    va_end(va); va_start(va,dummy);
     char * cs = (char *) malloc(size);
     if( cs == NULL ) return NULL;
-    for(int i = 0; i < n; i++) {
-      char * si = va_arg(va,char *);
-      strcat(cs,si);
-    } va_end(va);
-    // Return concatenated string
-    return cs;    
+    while( (si=va_arg(va,char *)) != NULL ) strcat(cs,si);
+    va_end(va); return cs;
   }

@@ -3,12 +3,11 @@
   // Guilherme Dantas
   // Felipe Vieira Ferreira
 
+  #include <stdarg.h>
+
+  #define concat(...) concatfunc((char *)0,__VA_ARGS__,(char *)0)
+
   // Concatenates strings of any size
-  // n - number of strings
-  // s, ... - dynamically allocated strings
+  // ... - non-null strings
   // > concatenated string, NULL
-  // [!] if any of the strings are NULL,
-  // they'll be simply ignored.
-  // [!] if one of the strings isn't
-  // dynamically allocated, it will crash :)
-  char * concat(int n, ...);
+  char * concatfunc(char * dummy, ...);
