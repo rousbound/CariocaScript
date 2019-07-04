@@ -1,8 +1,11 @@
 #!/bin/sh
 cd src
-echo -e "\e[32mMaking executable...\e[39m"
+echo -e "\e[32mMaking executables...\e[39m"
 make
 cd ..
+echo -e "\e[32mRunning utils test...\e[39m"
+./bin/t.utils
+echo -e "\e[32mEnd of utils test.\e[39m"
 if [ $# == 0 ]
 then
   cd tests

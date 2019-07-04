@@ -4,7 +4,9 @@
 CFLAGS = -w
 BINFLDR = ../bin
 
-all: setup $(BINFLDR)/provolone
+all: setup $(BINFLDR)/provolone tests
+
+tests: $(BINFLDR)/t.utils
 
 setup: $(BINFLDR)
 
@@ -18,7 +20,16 @@ provolone.tab.c provolone.tab.h: provolone.y colours.h
 	bison -d provolone.y
 
 $(BINFLDR)/provolone: lex.yy.c provolone.tab.c provolone.tab.h
-	gcc provolone.tab.c lex.yy.c -o $(BINFLDR)/provolone
+	gcc provolone.tab.c lex.yy.c -o $(BINFLDR)/provolone $(CFLAGS)
+
+utils.o: utils.c utils.h
+	gcc -c utils.c -o utils.o $(CFLAGS)
+
+t.utils.o: t.utils.c utils.h
+	gcc -c t.utils.c -o t.utils.o $(CFLAGS)
+
+$(BINFLDR)/t.utils: t.utils.o utils.o
+	gcc utils.o t.utils.o -o $(BINFLDR)/t.utils $(CFLAGS)
 
 clean: clear
 
