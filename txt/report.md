@@ -56,6 +56,12 @@ If not (full symbol table or if symble is in the middle of the code, not initial
 
 Also, to avoid memory leak, a routine has to be called after `yyparse` to free the allocated symbols on the symbol table. It is called on the `main` function (on `.y`), externed from the `.l` module.
 
+## Intermediate Code
+
+As advised by Hermann, an intermediate code between *Provol-One* and *JFLAP XML dialect* might help strucuture the output painlessly. Thought of as a less abstract language, this intermediate code describes what the *JFLAP Turing Machine* should do in relation to its tapes and its current state in the *DFA* (*deterministic finite automata*).
+
+We've decided to output this code as pairs of (state,command). The command might have a `goto` statement, which will work much like a transition to the state it points to. If no such redirection is specified, the normal flow will prevail (that is, set current state to next line's state and execute its command). The program ends when it arrives at the last state of the program (of higher index, and also, in the last line of the intermediate code).
+
 # Bibliography
 
 1. [Shift/Reduce](https://www.gnu.org/software/bison/manual/html_node/Shift_002fReduce.html)
