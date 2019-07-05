@@ -73,15 +73,15 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_entrada,"Loaded variables as input:\n");
-    sprintf(s_saida,"Loaded variables as output:\n");
+    sprintf(s_entrada,"Loaded symbols as input:\n");
+    sprintf(s_saida,"Loaded symbols as output:\n");
     sprintf(s_fim,"End of program.");
     $$ = concat(
       s_entrada,
       $2,
       s_saida,
       $4,
-      // $5,
+      $5,
       s_fim
     );
     if( !$$ )
@@ -93,7 +93,7 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
     free($2);
     free(s_saida);
     free($4);
-    // free($5);
+    free($5);
     free(s_fim);
     printf("%s\n",$$);
   };
@@ -126,7 +126,7 @@ var_def: ID
         yyerror(MEM_ERROR);
         YYERROR;
       }
-      sprintf(s_id,"Variable parsed: %d.\n",$1);
+      sprintf(s_id,"Symbol assigned to tape %d.\n",$1);
       $$ = s_id;
       symtab_size++;
     }
@@ -142,52 +142,149 @@ var_ref: ID
   }
 cmds: cmds cmd
   {
-    // $$ = concat($1,$2);
-    // if( !$$ )
-    // {
-    //   yyerror(MEM_ERROR);
-    //   YYERROR;
-    // }
-    // free($1); free($2);
+    $$ = concat($1,$2);
+    if( !$$ )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    free($1); free($2);
   }
   | cmd
   {
-    // $$ = $1; // simply pass the pointer
+    $$ = $1; // simply pass the pointer
   };
 cmd: FACA var_ref VEZES cmds FIM
   {
-    // char * s_id = (char *) malloc(sizeof(char)*32);
-    // if( !s_id )
-    // {
-    //   yyerror(MEM_ERROR);
-    //   YYERROR;
-    // }
-    // sprintf(s_id,"For loop parsed (%d times).\n",$2);
-    // $$ = s_id;
+    char * s_faca = (char *) malloc(sizeof(char)*48);
+    char * s_check = (char *) malloc(sizeof(char)*64);
+    char * s_fim = (char *) malloc(sizeof(char)*64);
+    if( !s_faca || !s_fim || !s_check )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    sprintf(s_faca,"Copy value on tape %d to counter tape\n",$2);
+    sprintf(s_check,"If value on counter tape is zero, unload it and exit loop.\n");
+    sprintf(s_fim,"Decrement value on tape %d and return to initial loop state.\n",$2);
+    $$ = concat(
+      s_faca,
+      s_check,
+      $4,
+      s_fim
+    );
+    if( !$$ )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    free(s_faca); free(s_check); free($4); free(s_fim);
   }
   | ENQUANTO var_ref FACA cmds FIM
   {
-    // printf("While loop parsed (while %d is true).\n",$2);
+    char * s_enquanto = (char *) malloc(sizeof(char)*64);
+    char * s_fim = (char *) malloc(sizeof(char)*64);
+    if( !s_enquanto || !s_fim )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    sprintf(s_enquanto,"If value on tape %d is zero, exit loop.\n",$2);
+    sprintf(s_fim,"Return to initial loop state concerning value on tape %d.\n",$2);
+    $$ = concat(
+      s_enquanto,
+      $4,
+      s_fim
+    );
+    if( !$$ )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    free(s_enquanto); free($4); free(s_fim);
   }
   | SE var_ref ENTAO cmds SENAO cmds FIM
   {
-    // printf("If else parsed (if %d).\n",$2);
+    char * s_if = (char *) malloc(sizeof(char)*48);
+    char * s_else = (char *) malloc(sizeof(char)*48);
+    char * s_fim = (char *) malloc(sizeof(char)*48);
+    if( !s_if || !s_else || !s_fim )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    sprintf(s_if,"If value on tape %d is different from zero, do:\n",$2);
+    sprintf(s_else,"Else, if value on tape %d is zero, do:\n",$2);
+    sprintf(s_fim,"End of if clause concerning tape %d.\n",$2);
+    $$ = concat(
+      s_if,
+      $4,
+      s_else,
+      $6,
+      s_fim
+    );
+    if( !$$ )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    free(s_if); free($4); free(s_else); free($6); free(s_fim);
   }
   | SE var_ref ENTAO cmds FIM
   {
-    // printf("If parsed (if %d).\n",$2);
+    char * s_if = (char *) malloc(sizeof(char)*48);
+    char * s_fim = (char *) malloc(sizeof(char)*48);
+    if( !s_if || !s_fim )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    sprintf(s_if,"If value on tape %d is different from zero, do:\n",$2);
+    sprintf(s_fim,"End of if clause concerning tape %d.\n",$2);
+    $$ = concat(
+      s_if,
+      $4,
+      s_fim
+    );
+    if( !$$ )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    free(s_if); free($4); free(s_fim);
   }
   | var_ref EQ var_ref
   {
-    // printf("Attribution %d = %d parsed.\n",$1,$3);
+    char * s_attr = (char *) malloc(sizeof(char)*48);
+    if( !s_attr )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    sprintf(s_attr,"Copy value from tape %d to tape %d.\n",$3,$1);
+    $$ = s_attr;
   }
   | INC OPEN_PAR var_ref CLOSE_PAR
   {
-    // printf("Increment %d parsed.\n",$3);
+    char * s_inc = (char *) malloc(sizeof(char)*32);
+    if( !s_inc )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    sprintf(s_inc,"Increment value on tape %d.\n",$3);
+    $$ = s_inc;
   }
   | ZERA OPEN_PAR var_ref CLOSE_PAR
   {
-    // printf("Zero-ing %d parsed.\n",$3);
+    char * s_zero = (char *) malloc(sizeof(char)*32);
+    if( !s_zero )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    sprintf(s_zero,"Zero value on tape %d.\n",$3);
+    $$ = s_zero;
   };
 %%
 
