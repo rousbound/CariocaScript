@@ -66,19 +66,19 @@
 // make a real one shortly:
 program: ENTRADA var_list SAIDA var_list cmds FIM
   {
-    char * s_fim = (char *) malloc(sizeof(char)*16);
+    char * s_fim = (char *) malloc(sizeof(char)*32);
     if( !s_fim )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_fim," %d\t End of program.",state);
+    sprintf(s_fim," %d\t End of program.\n",state);
     $$ = concat(
-      "Loaded input symbols:\n",
+      "\n Loaded input symbols:\n",
       $2,
-      "Loaded output symbols:\n",
+      " Loaded output symbols:\n",
       $4,
-      "\n State\t Command\n-------------------------------------------------\n",
+      " \n State\t Command\n-------------------------------------------------\n",
       $5,
       s_fim
     );
@@ -92,6 +92,7 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
     free($5);
     free(s_fim);
     printf("%s\n",$$); // show program
+    free($$);
   };
 var_list: var_list var_def
   {
@@ -122,7 +123,7 @@ var_def: ID
         yyerror(MEM_ERROR);
         YYERROR;
       }
-      sprintf(s_id,"Symbol assigned to tape %d.\n",$1);
+      sprintf(s_id," Symbol assigned to tape %d.\n",$1);
       $$ = s_id;
       symtab_size++;
     }
@@ -154,17 +155,17 @@ cmds: cmds cmd
   };
 cmd: FACA var_ref VEZES cmds FIM
   {
-    char * s_faca = (char *) malloc(sizeof(char)*64);
-    char * s_check = (char *) malloc(sizeof(char)*96);
-    char * s_fim = (char *) malloc(sizeof(char)*96);
+    char * s_faca = (char *) malloc(sizeof(char)*48);
+    char * s_check = (char *) malloc(sizeof(char)*64);
+    char * s_fim = (char *) malloc(sizeof(char)*64);
     if( !s_faca || !s_fim || !s_check )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_faca," %d\t Copy value on tape %d to counter tape\n",state,$2);
-    sprintf(s_check," %d'\t If value on counter tape is zero, unload it and goto %d.\n",state,state+1);
-    sprintf(s_fim," %d\"\t Decrement value on counter tape and goto %d'.\n",state,$2,state);
+    sprintf(s_faca," %d\t Add value on tape %d to stack\n",state,$2);
+    sprintf(s_check," %d'\t If value on stack is zero, dequeue it and goto %d.\n",state,state+1);
+    sprintf(s_fim," %d\"\t Decrement value on stack and goto %d'.\n",state,state);
     $$ = concat(
       s_faca,
       s_check,
