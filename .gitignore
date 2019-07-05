@@ -1,8 +1,9 @@
 # Binaries
 bin/
 
-# SWP files
+# Backup files
 *.swp
+*~
 
 # Java applications
 *.jar

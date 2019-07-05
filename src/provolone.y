@@ -17,6 +17,7 @@
 
   void yyerror(const char *s);
   int symtab_size = 0;
+  unsigned int state = 0;
 %}
 
 // Bison fundamentally works by asking flex to get the next token, which it
@@ -65,22 +66,19 @@
 // make a real one shortly:
 program: ENTRADA var_list SAIDA var_list cmds FIM
   {
-    char * s_entrada = (char *) malloc(sizeof(char)*32);
-    char * s_saida = (char *) malloc(sizeof(char)*32);
     char * s_fim = (char *) malloc(sizeof(char)*16);
-    if( !s_entrada || !s_saida || !s_fim )
+    if( !s_fim )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_entrada,"Loaded symbols as input:\n");
-    sprintf(s_saida,"Loaded symbols as output:\n");
-    sprintf(s_fim,"End of program.");
+    sprintf(s_fim," %d\t End of program.",state);
     $$ = concat(
-      s_entrada,
+      "Loaded input symbols:\n",
       $2,
-      s_saida,
+      "Loaded output symbols:\n",
       $4,
+      "\n State\t Command\n-------------------------------------------------\n",
       $5,
       s_fim
     );
@@ -89,13 +87,11 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    free(s_entrada);
     free($2);
-    free(s_saida);
     free($4);
     free($5);
     free(s_fim);
-    printf("%s\n",$$);
+    printf("%s\n",$$); // show program
   };
 var_list: var_list var_def
   {
@@ -149,24 +145,26 @@ cmds: cmds cmd
       YYERROR;
     }
     free($1); free($2);
+    state++;
   }
   | cmd
   {
     $$ = $1; // simply pass the pointer
+    state++;
   };
 cmd: FACA var_ref VEZES cmds FIM
   {
-    char * s_faca = (char *) malloc(sizeof(char)*48);
-    char * s_check = (char *) malloc(sizeof(char)*64);
-    char * s_fim = (char *) malloc(sizeof(char)*64);
+    char * s_faca = (char *) malloc(sizeof(char)*64);
+    char * s_check = (char *) malloc(sizeof(char)*96);
+    char * s_fim = (char *) malloc(sizeof(char)*96);
     if( !s_faca || !s_fim || !s_check )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_faca,"Copy value on tape %d to counter tape\n",$2);
-    sprintf(s_check,"If value on counter tape is zero, unload it and exit loop.\n");
-    sprintf(s_fim,"Decrement value on tape %d and return to initial loop state.\n",$2);
+    sprintf(s_faca," %d\t Copy value on tape %d to counter tape\n",state,$2);
+    sprintf(s_check," %d'\t If value on counter tape is zero, unload it and goto %d.\n",state,state+1);
+    sprintf(s_fim," %d\"\t Decrement value on tape %d and goto %d'.\n",state,$2,state);
     $$ = concat(
       s_faca,
       s_check,
@@ -183,14 +181,14 @@ cmd: FACA var_ref VEZES cmds FIM
   | ENQUANTO var_ref FACA cmds FIM
   {
     char * s_enquanto = (char *) malloc(sizeof(char)*64);
-    char * s_fim = (char *) malloc(sizeof(char)*64);
+    char * s_fim = (char *) malloc(sizeof(char)*32);
     if( !s_enquanto || !s_fim )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_enquanto,"If value on tape %d is zero, exit loop.\n",$2);
-    sprintf(s_fim,"Return to initial loop state concerning value on tape %d.\n",$2);
+    sprintf(s_enquanto," %d\t If value on tape %d is zero, goto %d.\n",state,$2,state+1);
+    sprintf(s_fim," %d'\t Goto %d.\n",state,state);
     $$ = concat(
       s_enquanto,
       $4,
@@ -205,85 +203,79 @@ cmd: FACA var_ref VEZES cmds FIM
   }
   | SE var_ref ENTAO cmds SENAO cmds FIM
   {
-    char * s_if = (char *) malloc(sizeof(char)*48);
-    char * s_else = (char *) malloc(sizeof(char)*48);
-    char * s_fim = (char *) malloc(sizeof(char)*48);
-    if( !s_if || !s_else || !s_fim )
+    char * s_if = (char *) malloc(sizeof(char)*64);
+    char * s_else = (char *) malloc(sizeof(char)*32);
+    if( !s_if || !s_else )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if,"If value on tape %d is different from zero, do:\n",$2);
-    sprintf(s_else,"Else, if value on tape %d is zero, do:\n",$2);
-    sprintf(s_fim,"End of if clause concerning tape %d.\n",$2);
+    sprintf(s_if," %d\t If value on tape %d is zero, goto %d'.\n",state,$2,state);
+    sprintf(s_else," %d*\t Goto %d\n %d'\t\n",state,state+1,state);
     $$ = concat(
       s_if,
       $4,
       s_else,
-      $6,
-      s_fim
+      $6
     );
     if( !$$ )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    free(s_if); free($4); free(s_else); free($6); free(s_fim);
+    free(s_if); free($4); free(s_else); free($6);
   }
   | SE var_ref ENTAO cmds FIM
   {
-    char * s_if = (char *) malloc(sizeof(char)*48);
-    char * s_fim = (char *) malloc(sizeof(char)*48);
-    if( !s_if || !s_fim )
+    char * s_if = (char *) malloc(sizeof(char)*64);
+    if( !s_if )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if,"If value on tape %d is different from zero, do:\n",$2);
-    sprintf(s_fim,"End of if clause concerning tape %d.\n",$2);
+    sprintf(s_if," %d\t If value on tape %d is zero, goto %d.\n",state,$2,state+1);
     $$ = concat(
       s_if,
-      $4,
-      s_fim
+      $4
     );
     if( !$$ )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    free(s_if); free($4); free(s_fim);
+    free(s_if); free($4);
   }
   | var_ref EQ var_ref
   {
-    char * s_attr = (char *) malloc(sizeof(char)*48);
+    char * s_attr = (char *) malloc(sizeof(char)*64);
     if( !s_attr )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_attr,"Copy value from tape %d to tape %d.\n",$3,$1);
+    sprintf(s_attr," %d\t Copy value from tape %d to tape %d.\n",state,$3,$1);
     $$ = s_attr;
   }
   | INC OPEN_PAR var_ref CLOSE_PAR
   {
-    char * s_inc = (char *) malloc(sizeof(char)*32);
+    char * s_inc = (char *) malloc(sizeof(char)*48);
     if( !s_inc )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_inc,"Increment value on tape %d.\n",$3);
+    sprintf(s_inc," %d\t Increment value on tape %d.\n",state,$3);
     $$ = s_inc;
   }
   | ZERA OPEN_PAR var_ref CLOSE_PAR
   {
-    char * s_zero = (char *) malloc(sizeof(char)*32);
+    char * s_zero = (char *) malloc(sizeof(char)*48);
     if( !s_zero )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_zero,"Zero value on tape %d.\n",$3);
+    sprintf(s_zero," %d\t Zero value on tape %d.\n",state,$3);
     $$ = s_zero;
   };
 %%

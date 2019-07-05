@@ -21,10 +21,10 @@
     free(a); free(b); free(c);
 
     // const strings (not dynamically allocated)
-    // -- does not work!
+    // -- works!
     char * d = concat("do ","tipo");
     fatal_assert(d);
-    assert(strcmp(d,"do tipo")!=0);
+    assert(strcmp(d,"do tipo")==0);
     free(d);
 
     // EPSILON TESTS
