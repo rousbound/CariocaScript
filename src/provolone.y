@@ -164,7 +164,7 @@ cmd: FACA var_ref VEZES cmds FIM
     }
     sprintf(s_faca," %d\t Copy value on tape %d to counter tape\n",state,$2);
     sprintf(s_check," %d'\t If value on counter tape is zero, unload it and goto %d.\n",state,state+1);
-    sprintf(s_fim," %d\"\t Decrement value on tape %d and goto %d'.\n",state,$2,state);
+    sprintf(s_fim," %d\"\t Decrement value on counter tape and goto %d'.\n",state,$2,state);
     $$ = concat(
       s_faca,
       s_check,
