@@ -181,14 +181,14 @@ cmd: FACA var_ref VEZES cmds FIM
   | ENQUANTO var_ref FACA cmds FIM
   {
     char * s_enquanto = (char *) malloc(sizeof(char)*64);
-    char * s_fim = (char *) malloc(sizeof(char)*64);
+    char * s_fim = (char *) malloc(sizeof(char)*32);
     if( !s_enquanto || !s_fim )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
     sprintf(s_enquanto," %d\t If value on tape %d is zero, goto %d.\n",state,$2,state+1);
-    sprintf(s_fim," %d'\t Decrement value on tape %d and goto %d.\n",state,$2,state);
+    sprintf(s_fim," %d'\t Goto %d.\n",state,state);
     $$ = concat(
       s_enquanto,
       $4,
