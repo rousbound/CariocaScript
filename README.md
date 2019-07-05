@@ -46,50 +46,6 @@ $ ./bin/provolone [file]
 
 The argument is optional. If no argument is given, the parser will simply read from **stdin**.
 
-## Code Style Standard
-
-* Indent with 2 spaces (configurable on text editor)
-* Underscores may be added to improve readability
-* Function and variables names should be lower case
-
-``` c
-double get_circumference (double radius);
-```
-
-* Constants names should be upper case
-
-``` c
-#define PI 3.1415f
-// or
-double PI = 3.1415;
-```
-
-* Open code blocks on the following line
-
-``` c
-if( get_circumference(radius) == 0 )
-{
-  exit(1);
-}
-```
-
-* One-liners are allowed if to improve conciseness
-
-``` c
-if( get_circumference(radius) == 0 ) exit(1);
-```
-
-* Document functions as follow
-
-``` c
-// Opens file for read only access
-// file_name - file relative path
-// > file pointer, NULL
-// [!] if an error occurs, file will not
-// be opened and NULL will be returned
-FILE * read_file (const char * file_name);
-```
-
 ## Project Information
 
 * [Hermann *(Course Supervisor)*](http://www-di.inf.puc-rio.br/~hermann/)
