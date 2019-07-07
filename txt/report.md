@@ -52,13 +52,13 @@ That way, we can define each command at the end of the program and simply call t
 
 Since the Turing Machine will be able to handle only up to 4 variables, *the symbol table will also hold up to 4 symbols*. The algorithm works as follows: every time the lexer parses the regular expression for `id`, it will look for a symbol of same string on the symbol table. If found, its index in the symbol table is returned. If not, it checks whether there is room for a new symbol definition (`#syms < 4`) and if the rule accepts a new symbol definition (e.g. in `ENTRADA` and `SAIDA`).
 
-If not (full symbol table or if symble is in the middle of the code, not initialized), an error is thrown by the `yyerror` bison routine<sup>(6)</sup> and the program is interrupted. Else, the new symbol table entry is registered, the `#syms` counter is incremented, and the new symbol index is returned.
+If not (full symbol table or if symbol is in the middle of the code, not initialized), an error is thrown by the `yyerror` bison routine<sup>(6)</sup> and the program is interrupted. Else, the new symbol table entry is registered, the `#syms` counter is incremented, and the new symbol index is returned.
 
-Also, to avoid memory leak, a routine has to be called after `yyparse` to free the allocated symbols on the symbol table. It is called on the `main` function (on `.y`), externed from the `.l` module.
+Also, to avoid memory leak, a routine has to be called after `yyparse` to free the allocated symbols on the symbol table. It is called on the `main` function (on `.y`), imported from the `.l` module.
 
 ## Intermediate Code
 
-As advised by Hermann, an intermediate code between *Provol-One* and *JFLAP XML dialect* might help strucuture the output painlessly. Thought of as a less abstract language, this intermediate code describes what the *JFLAP Turing Machine* should do in relation to its tapes and its current state in the *DFA* (*deterministic finite automata*).
+As advised by Hermann, an intermediate code between *Provol-One* and *JFLAP XML dialect* might help structure the output painlessly. Thought of as a less abstract language, this intermediate code describes what the *JFLAP Turing Machine* should do in relation to its tapes and its current state in the *DFA* (*deterministic finite automata*).
 
 We've decided to output this code as pairs of (state,command). The command might have a `goto` statement, which will work much like a transition to the state it points to. If no such redirection is specified, the normal flow will prevail (that is, set current state to next line's state and execute its command). The program ends when it arrives at the last state of the program (of higher index, and also, in the last line of the intermediate code).
 
