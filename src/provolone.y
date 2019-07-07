@@ -158,93 +158,105 @@ cmd: FACA var_ref VEZES cmds FIM
     char * s_faca = (char *) malloc(sizeof(char)*48);
     char * s_check = (char *) malloc(sizeof(char)*64);
     char * s_fim = (char *) malloc(sizeof(char)*64);
-    if( !s_faca || !s_fim || !s_check )
+    char * s_exit = (char *) malloc(sizeof(char)*8);
+    if( !s_faca || !s_fim || !s_check || !s_exit )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
     sprintf(s_faca," %d\t Add value on tape %d to stack\n",state,$2);
-    sprintf(s_check," %d'\t If value on stack is zero, dequeue it and goto %d.\n",state,state+1);
+    sprintf(s_check," %d'\t If value on stack is zero, dequeue it and goto %d*.\n",state,state);
     sprintf(s_fim," %d\"\t Decrement value on stack and goto %d'.\n",state,state);
+    sprintf(s_exit," %d*\n",state);
     $$ = concat(
       s_faca,
       s_check,
       $4,
-      s_fim
+      s_fim,
+      s_exit
     );
     if( !$$ )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    free(s_faca); free(s_check); free($4); free(s_fim);
+    free(s_faca); free(s_check); free($4); free(s_fim); free(s_exit);
   }
   | ENQUANTO var_ref FACA cmds FIM
   {
     char * s_enquanto = (char *) malloc(sizeof(char)*64);
     char * s_fim = (char *) malloc(sizeof(char)*32);
-    if( !s_enquanto || !s_fim )
+    char * s_exit = (char *) malloc(sizeof(char)*8);
+    if( !s_enquanto || !s_fim || !s_exit )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_enquanto," %d\t If value on tape %d is zero, goto %d.\n",state,$2,state+1);
+    sprintf(s_enquanto," %d\t If value on tape %d is zero, goto %d*.\n",state,$2,state);
     sprintf(s_fim," %d'\t Goto %d.\n",state,state);
+    sprintf(s_exit," %d*\n",state);
     $$ = concat(
       s_enquanto,
       $4,
-      s_fim
+      s_fim,
+      s_exit
     );
     if( !$$ )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    free(s_enquanto); free($4); free(s_fim);
+    free(s_enquanto); free($4); free(s_fim); free(s_exit);
   }
   | SE var_ref ENTAO cmds SENAO cmds FIM
   {
     char * s_if = (char *) malloc(sizeof(char)*64);
     char * s_else = (char *) malloc(sizeof(char)*32);
-    if( !s_if || !s_else )
+    char * s_exit = (char *) malloc(sizeof(char)*8);
+    if( !s_if || !s_else || !s_exit )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if," %d\t If value on tape %d is zero, goto %d'.\n",state,$2,state);
-    sprintf(s_else," %d*\t Goto %d\n %d'\t\n",state,state+1,state);
+    sprintf(s_if," %d\t If value on tape %d is zero, goto %d\".\n",state,$2,state);
+    sprintf(s_else," %d'\t Goto %d*\n %d\"\n",state,state,state);
+    sprintf(s_exit," %d*\n",state);
     $$ = concat(
       s_if,
       $4,
       s_else,
-      $6
+      $6,
+      s_exit
     );
     if( !$$ )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    free(s_if); free($4); free(s_else); free($6);
+    free(s_if); free($4); free(s_else); free($6); free(s_exit);
   }
   | SE var_ref ENTAO cmds FIM
   {
     char * s_if = (char *) malloc(sizeof(char)*64);
+    char * s_exit = (char *) malloc(sizeof(char)*8);
     if( !s_if )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if," %d\t If value on tape %d is zero, goto %d.\n",state,$2,state+1);
+    sprintf(s_if," %d\t If value on tape %d is zero, goto %d*.\n",state,$2,state);
+    sprintf(s_exit," %d*\n",state);
     $$ = concat(
       s_if,
-      $4
+      $4,
+      s_exit
     );
     if( !$$ )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    free(s_if); free($4);
+    free(s_if); free($4); free(s_exit);
   }
   | var_ref EQ var_ref
   {

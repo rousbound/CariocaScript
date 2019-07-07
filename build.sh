@@ -12,6 +12,7 @@ then
   for file in *;
   do
     echo -e "\e[32mRunning test '$file'...\e[39m"
+    cat $file
     ./../bin/provolone $file
   done
 else
