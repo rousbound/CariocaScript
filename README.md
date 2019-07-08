@@ -5,6 +5,18 @@
 * **Supervisor:** Edward Hermann Haeusler
 * **Group members:** *Felipe Vieira Ferreira*, *Guilherme Dantas de Oliveira* & *Roberto Mario Lemos Teran Luna*
 
+## Sections
+
+- [Getting Started](#getting-started)
+- [Running Tests](#running-tests)
+- [Development](#development)
+  - [Shift/Reduce Conflicts](#shiftreduce-conflicts)
+  - [Code Generation](#code-generation)
+  - [Symbol Table](#symbol-table)
+  - [Intermediate Code](#intermediate-code)
+- [Bibliography](#bibliography)
+- [Project Information](#project-information)
+
 ## Getting Started
 
 In order to have the project running on your machine, you must install the **Flex** and **Bison** packages. For the following installations, you'll be prompted with a y/N question - answer with 'y', for yes.
@@ -31,7 +43,11 @@ $ ./bin/provolone [file]
 
 The argument is optional. If no argument is given, the parser will simply read from **stdin**.
 
-## Shift/Reduce Conflicts
+## Development
+
+Here I report the obstacles I stumbled upon during this assignment.
+
+### Shift/Reduce Conflicts
 
 The grammar presented on the project statement is clearly ambiguous. After formalizing it in Yacc (Bison), 8 SR (shift/reduce) conflicts were presented:
 
@@ -65,7 +81,7 @@ SE STRING ENTAO cmds FIM
 
 That solves the later SR conflict because when the parser cursor is after 'cmds', there are two different shifts: `SENAO` and `FIM`. Thus, having two different tokens to shift resolves the conflict.
 
-## Code Generation
+### Code Generation
 
 Since JFLAP Multi-Tape Turing Machine has the limit of **five tapes**, our program will be limited to having a maximum of four variables (input and output) - one tape for each. The remaining tape will be used to store the counter for the `FACA` loops.
 
@@ -77,7 +93,7 @@ In the XML, the building blocks are specified with the `<block>` tab. And inside
 
 That way, we can define each command at the end of the program and simply call the building block whenever a command is found. But the real challenge will be to deal with loop commands like `ENQUANTO` and `FACA`, since they will deal with more than one value on the last tape.
 
-## Symbol Table
+### Symbol Table
 
 Since the Turing Machine will be able to handle only up to 4 variables, *the symbol table will also hold up to 4 symbols*. The algorithm works as follows: every time the lexer parses the regular expression for `id`, it will look for a symbol of same string on the symbol table. If found, its index in the symbol table is returned. If not, it checks whether there is room for a new symbol definition (`#syms < 4`) and if the rule the parser is currently on accepts a new symbol definition (e.g. after `ENTRADA` and `SAIDA` tokens).
 
@@ -85,7 +101,7 @@ If not (full symbol table or if symbol is in the middle of the code - thus, not 
 
 Also, to avoid memory leak, a routine has to be called after `yyparse` to free the allocated symbols on the symbol table. It is called on the `main` function on the parser, imported from the lexer.
 
-## Intermediate Code
+### Intermediate Code
 
 As advised by Hermann, an intermediate code between *Provol-One* and *JFLAP XML dialect* might help structure the output painlessly. Thought of as a less abstract language, this intermediate code describes what the *JFLAP Turing Machine* should do in relation to its tapes and its current state in the *DFA* (*deterministic finite automata*).
 
@@ -99,3 +115,9 @@ We've decided to output this code as pairs of (state,command). The command might
 4. [JFLAP TM Building Blocks](http://www.jflap.org/tutorial/turing/buildingblocks/buildingblocks.htm)
 5. [JFLAP TM Building Blocks Examples](http://www.jflap.org/jflapfiles/TMBBexamples/)
 6. [Error Reporting in Bison](https://www.gnu.org/software/bison/manual/html_node/Error-Reporting.html)
+
+## Project Information
+
+* [Hermann *(Course Supervisor)*](http://www-di.inf.puc-rio.br/~hermann/)
+* [Statement *(in Portuguese)*](https://drive.google.com/file/d/185EW11LlP18a115te7fuPol0oz6TyTKs/view?usp=sharing)
+
