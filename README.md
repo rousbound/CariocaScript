@@ -7,8 +7,7 @@ This final project consists in using the **Flex/Bison (Lex/Yacc)** toolkit to ge
 ## Sections
 
 - [Getting Started](#getting-started)
-  - [Running tests](#running-tests)
-- [Code Style Standard](#code-style-standard)
+- [Running tests](#running-tests)
 - [Project Information](#project-information)
 - [Software Dependecies](#software-dependencies)
 
@@ -29,7 +28,7 @@ $ cd src
 $ make
 ```
 
-### Running tests
+## Running tests
 
 From the repository root, you may run the parser/compiler as follows:
 
