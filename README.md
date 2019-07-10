@@ -3,7 +3,10 @@
 * **Course:** INF1022
 * **Semester:** 2019.1
 * **Supervisor:** Edward Hermann Haeusler
-* **Group members:** *Felipe Vieira Ferreira*, *Guilherme Dantas de Oliveira* & *Roberto Mario Lemos Teran Luna*
+* **Group members:**
+  * *Felipe Vieira Ferreira*
+  * *Guilherme Dantas de Oliveira*
+  * *Roberto Mario Lemos Teran Luna*
 
 ## Sections
 
