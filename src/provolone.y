@@ -20,14 +20,6 @@
   unsigned int state = 0;
 %}
 
-// Bison fundamentally works by asking flex to get the next token, which it
-// returns as an object of type "yystype".  Initially (by default), yystype
-// is merely a typedef of "int", but for non-trivial projects, tokens could
-// be of any arbitrary data type.  So, to deal with that, the idea is to
-// override yystype's default typedef to be a C union instead.  Unions can
-// hold all of the types of tokens that Flex could return, and this this means
-// we can return ints or floats or strings cleanly.  Bison implements this
-// mechanism with the %union directive:
 %union {
   int ival;
   char * sval;
@@ -49,10 +41,7 @@
 %token CLOSE_PAR
 %token EQ
 
-// Define the "terminal symbol" token types and associate each with a field of the %union:
 %token <ival> ID
-
-// Define the "non-terminal symbols" types and associate each with a field of the %union:
 %type <sval> program
 %type <sval> var_list
 %type <sval> var_def
@@ -61,9 +50,6 @@
 %type <sval> cmd
 
 %%
-// This is the actual grammar that bison will parse, but for right now it's just
-// something silly to echo to the screen what bison gets from flex.  We'll
-// make a real one shortly:
 program: ENTRADA var_list SAIDA var_list cmds FIM
   {
     char * s_fim = (char *) malloc(sizeof(char)*32);
@@ -72,7 +58,7 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_fim," %d\t End of program.\n",state);
+    sprintf(s_fim," %d\t FIM.\n",state);
     $$ = concat(
       "\n Loaded input symbols:\n",
       $2,
@@ -146,41 +132,45 @@ cmds: cmds cmd
       YYERROR;
     }
     free($1); free($2);
-    state++;
+		state++;
   }
   | cmd
   {
     $$ = $1; // simply pass the pointer
-    state++;
+		state++;
   };
 cmd: FACA var_ref VEZES cmds FIM
   {
-    char * s_faca = (char *) malloc(sizeof(char)*48);
-    char * s_check = (char *) malloc(sizeof(char)*64);
-    char * s_fim = (char *) malloc(sizeof(char)*64);
-    char * s_exit = (char *) malloc(sizeof(char)*8);
-    if( !s_faca || !s_fim || !s_check || !s_exit )
+    char * s_copia = (char *) malloc(sizeof(char)*48);
+    char * s_zera = (char *) malloc(sizeof(char)*64);
+    char * s_if = (char *) malloc(sizeof(char)*64);
+    char * s_inc = (char *) malloc(sizeof(char)*32);
+    if( !s_copia || !s_if || !s_zera || !s_inc )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_faca," %d\t Add value on tape %d to stack\n",state,$2);
-    sprintf(s_check," %d'\t If value on stack is zero, dequeue it and goto %d*.\n",state,state);
-    sprintf(s_fim," %d\"\t Decrement value on stack and goto %d'.\n",state,state);
-    sprintf(s_exit," %d*\n",state);
+		int iterator = symtab_size;
+		int stack = symtab_size+1;
+		int loop = state+2;
+    sprintf(s_copia," %d \t COPIA(%d,%d)  \n",state,$2,iterator);
+    sprintf(s_zera," %d \t ZERA(%d) \n",state+1, stack);
+    sprintf(s_inc," %d \t INC(%d) \n",state+2,iterator);
+
+    sprintf(s_if," %d \t IF(%d,%d) je %d \n",state+3,iterator,stack,loop);
     $$ = concat(
-      s_faca,
-      s_check,
+      s_copia,
+			s_zera,
+			s_inc,
       $4,
-      s_fim,
-      s_exit
+      s_if
     );
     if( !$$ )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    free(s_faca); free(s_check); free($4); free(s_fim); free(s_exit);
+    free(s_copia); free(s_if); free($4);  free(s_zera); free(s_inc);
   }
   | ENQUANTO var_ref FACA cmds FIM
   {
@@ -192,8 +182,8 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_enquanto," %d\t If value on tape %d is zero, goto %d*.\n",state,$2,state);
-    sprintf(s_fim," %d'\t Goto %d.\n",state,state);
+    sprintf(s_enquanto," %d\t If tape %d == 0, jmp %d*.\n",state,$2,state);
+    sprintf(s_fim," %d'\t jmp %d.\n",state,state);
     sprintf(s_exit," %d*\n",state);
     $$ = concat(
       s_enquanto,
@@ -218,7 +208,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if," %d\t If value on tape %d is zero, goto %d\".\n",state,$2,state);
+    sprintf(s_if," %d\t If(%d,%d)  %d\".\n",state,$2,state);
     sprintf(s_else," %d'\t Goto %d*\n %d\"\n",state,state,state);
     sprintf(s_exit," %d*\n",state);
     $$ = concat(
@@ -244,7 +234,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if," %d\t If value on tape %d is zero, goto %d*.\n",state,$2,state);
+    sprintf(s_if," %d\t If tape %d == 0, jmp %d*.\n",state,$2,state);
     sprintf(s_exit," %d*\n",state);
     $$ = concat(
       s_if,
@@ -266,7 +256,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_attr," %d\t Copy value from tape %d to tape %d.\n",state,$3,$1);
+    sprintf(s_attr," %d\t COPIA(%d, %d) \n",state,$3,$1);
     $$ = s_attr;
   }
   | INC OPEN_PAR var_ref CLOSE_PAR
@@ -277,7 +267,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_inc," %d\t Increment value on tape %d.\n",state,$3);
+    sprintf(s_inc," %d\t INC(%d) \n",state,$3);
     $$ = s_inc;
   }
   | ZERA OPEN_PAR var_ref CLOSE_PAR
