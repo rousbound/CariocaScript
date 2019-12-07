@@ -2,13 +2,11 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
-  #include "colours.h"
   #include "utils.h"
 
   #define OVFLW_ERROR "symbol table overflow"
   #define MEM_ERROR "could not allocate memory"
 
-  // Declare stuff from Flex that Bison needs to know about:
   extern int yylex();
   extern int yyparse();
   extern void free_symtab();
@@ -18,6 +16,7 @@
   void yyerror(const char *s);
   int symtab_size = 0;
   unsigned int state = 0;
+	int label = 0;
 %}
 
 %union {
@@ -58,13 +57,13 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_fim," %d\t FIM.\n",state);
+    sprintf(s_fim," \t FIM\n");
     $$ = concat(
-      "\n Loaded input symbols:\n",
+      "\n Loaded input symbols to registers:\n",
       $2,
-      " Loaded output symbols:\n",
+      " Loaded output symbols to registers:\n",
       $4,
-      " \n State\t Command\n-------------------------------------------------\n",
+      " \n Labels\t Command\n-------------------------------------------------\n",
       $5,
       s_fim
     );
@@ -109,7 +108,7 @@ var_def: ID
         yyerror(MEM_ERROR);
         YYERROR;
       }
-      sprintf(s_id," Symbol assigned to tape %d.\n",$1);
+      sprintf(s_id," Symbol assigned to %r%d.\n",$1);
       $$ = s_id;
       symtab_size++;
     }
@@ -142,35 +141,35 @@ cmds: cmds cmd
 cmd: FACA var_ref VEZES cmds FIM
   {
     char * s_copia = (char *) malloc(sizeof(char)*48);
-    char * s_zera = (char *) malloc(sizeof(char)*64);
     char * s_if = (char *) malloc(sizeof(char)*64);
     char * s_inc = (char *) malloc(sizeof(char)*32);
-    if( !s_copia || !s_if || !s_zera || !s_inc )
+    char * s_exit = (char *) malloc(sizeof(char)*8);
+    if( !s_copia || !s_if || !s_inc )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
 		int iterator = symtab_size;
 		int stack = symtab_size+1;
-		int loop = state+2;
-    sprintf(s_copia," %d \t COPIA(%d,%d)  \n",state,$2,iterator);
-    sprintf(s_zera," %d \t ZERA(%d) \n",state+1, stack);
-    sprintf(s_inc," %d \t INC(%d) \n",state+2,iterator);
+    sprintf(s_copia,"  \t COPIA(%r%d,%r%d)\nL%d:\n",$2,iterator,label);
+    sprintf(s_inc,"  \t INC(%r%d) \n",iterator);
 
-    sprintf(s_if," %d \t IF(%d,%d) je %d \n",state+3,iterator,stack,loop);
+    sprintf(s_if,"  \t IF(%r%d,$0)\n \t jne L%d \n",iterator,label);
+		label++;
+    sprintf(s_exit,"\n",label);
     $$ = concat(
       s_copia,
-			s_zera,
 			s_inc,
       $4,
-      s_if
+      s_if,
+			s_exit
     );
     if( !$$ )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    free(s_copia); free(s_if); free($4);  free(s_zera); free(s_inc);
+    free(s_copia); free(s_if); free($4); free(s_inc); free(s_exit);
   }
   | ENQUANTO var_ref FACA cmds FIM
   {
@@ -182,13 +181,14 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_enquanto," %d\t If tape %d == 0, jmp %d*.\n",state,$2,state);
-    sprintf(s_fim," %d'\t jmp %d.\n",state,state);
-    sprintf(s_exit," %d*\n",state);
+		
+    sprintf(s_enquanto,"L%d:\n\t IF(%r%d,$0)\n\t je L%d\n",label,$2,label+2);
+    sprintf(s_fim," \t jmp %d\n",state);
+    sprintf(s_exit," \n");
     $$ = concat(
       s_enquanto,
       $4,
-      s_fim,
+      //s_fim,
       s_exit
     );
     if( !$$ )
@@ -208,15 +208,15 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if," %d\t If(%d,%d)  %d\".\n",state,$2,state);
-    sprintf(s_else," %d'\t Goto %d*\n %d\"\n",state,state,state);
-    sprintf(s_exit," %d*\n",state);
+    sprintf(s_if," \t IF(%r%d,$0)\n\t je L%d\n",$2,label);
+    sprintf(s_else,"L%d:\n",label++);
+    sprintf(s_exit,"L%d:\n",label++);
     $$ = concat(
       s_if,
       $4,
-      s_else,
+			s_else,
       $6,
-      s_exit
+			s_exit
     );
     if( !$$ )
     {
@@ -234,8 +234,8 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if," %d\t If tape %d == 0, jmp %d*.\n",state,$2,state);
-    sprintf(s_exit," %d*\n",state);
+    sprintf(s_if," \t IF(%r%d,$0)\n\t jmp L%d\n",$2,label+1);
+    sprintf(s_exit," \t jmp L%d\n",label+1);
     $$ = concat(
       s_if,
       $4,
@@ -256,7 +256,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_attr," %d\t COPIA(%d, %d) \n",state,$3,$1);
+    sprintf(s_attr," %d\t COPIA(%r%d, %r%d) \n",state,$3,$1);
     $$ = s_attr;
   }
   | INC OPEN_PAR var_ref CLOSE_PAR
@@ -267,7 +267,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_inc," %d\t INC(%d) \n",state,$3);
+    sprintf(s_inc,"\t INC(%r%d) \n",$3);
     $$ = s_inc;
   }
   | ZERA OPEN_PAR var_ref CLOSE_PAR
@@ -278,7 +278,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_zero," %d\t Zero value on tape %d.\n",state,$3);
+    sprintf(s_zero," \t ZERA(%r%d)\n",$3);
     $$ = s_zero;
   };
 %%
@@ -309,7 +309,5 @@ int main(int argc, char** argv) {
 }
 
 void yyerror(const char *s) {
-  printf(BOLD_CYAN);
   printf("Parsing error at line %d: '%s'\n",line_num,s);
-  printf(DEFAULT_COLOUR);
 }

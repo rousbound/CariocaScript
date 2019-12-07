@@ -1,7 +1,4 @@
 
-  // Utilities module implementation
-  // Guilherme Dantas
-  // Felipe Vieira Ferreira
 
   #include <stdlib.h>
   #include <stdarg.h>

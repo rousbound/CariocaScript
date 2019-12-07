@@ -1,8 +1,4 @@
 
-  // Utilities module interface
-  // Guilherme Dantas
-  // Felipe Vieira Ferreira
-
   #include <stdarg.h>
 
   // Concatenates strings of any size
