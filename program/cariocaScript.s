@@ -18,8 +18,9 @@ L3:
  	 jne L3 
 
  	 movq $Sf, %rdi
-	 movl %r12d, %esi
+	 movl %r12d, %ebx
+	 movl %ebx, %esi
 	 call printf
-    	 movq %rbp, %rsp
+	     	 movq %rbp, %rsp
 	 popq %rbp
 	 ret

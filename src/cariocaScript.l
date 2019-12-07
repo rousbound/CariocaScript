@@ -14,6 +14,7 @@
 %%
 [ \t]         ;
 CHEGAMAIS         { return CHEGAMAIS; }
+CARAI             { return CARAI; }
 CAIFORA           { return CAIFORA; }
 VALEU             { return VALEU; }
 MARCA             { return MARCA; }

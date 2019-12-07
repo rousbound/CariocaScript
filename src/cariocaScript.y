@@ -25,6 +25,7 @@
 }
 
 %token CHEGAMAIS
+%token CARAI
 %token CAIFORA
 %token VALEU
 %token FACA
@@ -58,7 +59,7 @@
 %type <sval> cmd
 
 %%
-program: CHEGAMAIS var_list CAIFORA var_list cmds VALEU
+program: CHEGAMAIS var_list CARAI cmds VALEU
   {
     char * s_fim = (char *) malloc(sizeof(char)*64);
     char * s_begin = (char *) malloc(sizeof(char)*128);
@@ -87,15 +88,13 @@ program: CHEGAMAIS var_list CAIFORA var_list cmds VALEU
 												 "call printf\n"); 
 		
     $$ = concat(
-      "\n Loaded input symbols to registers:\n\n",
+      "\n Loaded symbols to registers:\n\n",
       $2,
-      "\n Loaded output symbols to registers:\n\n",
-      $4,
       " \n Labels\t Command\n-------------------------------------------------\n",
 			s_begin,
 			s_load,
-      $5,
-			s_printf,
+      $4,
+			//s_printf,
       s_fim
     );
     if( !$$ )
@@ -105,7 +104,7 @@ program: CHEGAMAIS var_list CAIFORA var_list cmds VALEU
     }
     free($2);
     free($4);
-    free($5);
+    //free($5);
     free(s_fim);
     free(s_begin);
     free(s_load);
@@ -354,8 +353,8 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
 		sprintf(s_print," \t movq $Sf, %rdi\n\t "
 									     "movl %r%d, %%ebx\n\t "
 											 "movl %%ebx, %%esi\n\t "
-											 "call printf\n\t " 
-											 "movl %%ebx, %r%d\n\n ",$3,$3);
+											 "call printf\n\t ",$3,$3); 
+											 //"movl %%ebx, %r%d\n\n ",$3,$3);
 
     $$ = s_print;
 

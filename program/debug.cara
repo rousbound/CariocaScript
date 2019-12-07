@@ -1,24 +1,24 @@
 [32mMaking executables...[39m
+bison -d cariocaScript.y
+flex cariocaScript.l
+gcc cariocaScript.tab.c lex.yy.c utils.o -o ../bin/cariocaScript -w
 Original Program
 --------------------
-CHEGAMAIS X,Y
-CAIFORA Z
+CHEGAMAIS X,Y,Z CARAI
 Z=X
 RELAXOU(Z)
 MARCA X RAPIDAO
 	Z += Y
 VALEU
+FALATU(Z)
 VALEU
 --------------------
 [32mRunning test 'tests/t1.cara'...[39m
 
- Loaded input symbols to registers:
+ Loaded symbols to registers:
 
   -Variable assigned to register %r0.
   -Variable assigned to register %r1.
-
- Loaded output symbols to registers:
-
   -Variable assigned to register %r2.
  
  Labels	 Command
@@ -43,9 +43,10 @@ L3:
  	 jne L3 
 
  	 movq $Sf, %rdi
-	 movl %r2, %esi
+	 movl %r2, %ebx
+	 movl %ebx, %esi
 	 call printf
-    	 movq %rbp, %rsp
+	     	 movq %rbp, %rsp
 	 popq %rbp
 	 ret
 [32mEnd of Build[39m
