@@ -1,7 +1,7 @@
-.globl  provolone
+.globl  cariocaScript
 Sf:  .string "Output:%d\n"
 
-provolone:
+cariocaScript:
 	 pushq %rbp
 	 movq %rsp, %rbp 
 
@@ -16,6 +16,11 @@ L2:
   	 cmpl %r10d, %r13d
  	 jne L2 
 
+ 	 cmpl $0, %r11d 
+	 je L5
+	 movl %r11d, %r10d 
+	 movl %r10d, %r12d 
+L5:
  	 movq $Sf, %rdi
 	 movl %r12d, %esi
 	 call printf

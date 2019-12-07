@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-void provolone(int a, int b);
+void cariocaScript(int a, int b);
 
 int main(){
 
@@ -8,7 +8,7 @@ int main(){
 
 	printf("Entre dois valores:" );
 	scanf("%d %d",&a,&b);
-	provolone(a,b);
+	cariocaScript(a,b);
 
 	return 0;
 }

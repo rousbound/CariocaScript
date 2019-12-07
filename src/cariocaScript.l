@@ -1,6 +1,6 @@
 %{
   #include <string.h>
-  #include "provolone.tab.h"
+  #include "cariocaScript.tab.h"
 
   #define MAX_VAR_CNT 4
 
@@ -13,13 +13,15 @@
 %option noyywrap
 %%
 [ \t]         ;
-ENTRADA         { return ENTRADA; }
-SAIDA           { return SAIDA; }
-FIM             { return FIM; }
+CHEGAMAIS         { return CHEGAMAIS; }
+CAIFORA           { return CAIFORA; }
+VALEU             { return VALEU; }
+MARCA            { return MARCA; }
+RAPIDAO            { return RAPIDAO; }
 FACA            { return FACA; }
 VEZES           { return VEZES; }
 ENQUANTO        { return ENQUANTO; }
-SE              { return SE; }
+SEPA              { return SEPA; }
 ENTAO           { return ENTAO; }
 SENAO           { return SENAO; }
 INC             { return INC; }

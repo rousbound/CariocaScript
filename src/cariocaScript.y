@@ -24,14 +24,15 @@
   char * sval;
 }
 
-// define the constant-string tokens:
-%token ENTRADA
-%token SAIDA
-%token FIM
+%token CHEGAMAIS
+%token CAIFORA
+%token VALEU
 %token FACA
+%token MARCA
+%token RAPIDAO
 %token VEZES
 %token ENQUANTO
-%token SE
+%token SEPA
 %token ENTAO
 %token SENAO
 %token INC
@@ -53,7 +54,7 @@
 %type <sval> cmd
 
 %%
-program: ENTRADA var_list SAIDA var_list cmds FIM
+program: CHEGAMAIS var_list CAIFORA var_list cmds VALEU
   {
     char * s_fim = (char *) malloc(sizeof(char)*32);
     char * s_begin = (char *) malloc(sizeof(char)*64);
@@ -64,7 +65,7 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_begin,".globl  provolone\nSf:  .string \"Output:%%d\\n\"\n\nprovolone:\n\t pushq %rbp\n\t movq %rsp,%rbp \n\n");
+    sprintf(s_begin,".globl  cariocaScript\nSf:  .string \"Output:%%d\\n\"\n\ncariocaScript:\n\t pushq %rbp\n\t movq %rsp,%rbp \n\n");
     sprintf(s_load," \t movl %%edi, %r0\n\t movl %%esi, %r1\n\n");
     sprintf(s_fim," \t movq %rbp, %rsp\n\t popq %rbp\n\t ret");
 		sprintf(s_printf," \t movq $Sf, %rdi\n\t movl %r2, %%esi\n\t call printf\n");
@@ -154,7 +155,7 @@ cmds: cmds cmd
     $$ = $1; // simply pass the pointer
 		label++;
   };
-cmd: FACA var_ref VEZES cmds FIM
+cmd: MARCA var_ref RAPIDAO cmds VALEU
   {
     char * s_copia = (char *) malloc(sizeof(char)*48);
     char * s_if = (char *) malloc(sizeof(char)*64);
@@ -186,7 +187,7 @@ cmd: FACA var_ref VEZES cmds FIM
     }
     free(s_copia); free(s_if); free($4); free(s_inc); free(s_exit);
   }
-  | ENQUANTO var_ref FACA cmds FIM
+  | ENQUANTO var_ref FACA cmds VALEU
   {
     char * s_enquanto = (char *) malloc(sizeof(char)*64);
     char * s_fim = (char *) malloc(sizeof(char)*32);
@@ -212,7 +213,7 @@ cmd: FACA var_ref VEZES cmds FIM
     }
     free(s_enquanto); free($4); free(s_fim); free(s_exit);
   }
-  | SE var_ref ENTAO cmds SENAO cmds FIM
+  | SEPA var_ref ENTAO cmds SENAO cmds VALEU
   {
     char * s_if = (char *) malloc(sizeof(char)*64);
     char * s_else = (char *) malloc(sizeof(char)*32);
@@ -239,7 +240,7 @@ cmd: FACA var_ref VEZES cmds FIM
     }
     free(s_if); free($4); free(s_else); free($6); free(s_exit);
   }
-  | SE var_ref ENTAO cmds FIM
+  | SEPA var_ref ENTAO cmds VALEU
   {
     char * s_if = (char *) malloc(sizeof(char)*64);
     char * s_exit = (char *) malloc(sizeof(char)*8);

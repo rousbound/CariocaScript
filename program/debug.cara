@@ -1,15 +1,19 @@
 [32mMaking executables...[39m
 Original Program
 --------------------
-ENTRADA X,Y
-SAIDA Z
+CHEGAMAIS X,Y
+CAIFORA Z
 ZERA(Z)
-FACA X VEZES
+MARCA X RAPIDAO
 	Z += Y
-FIM
-FIM
+VALEU
+SEPA Y ENTAO
+	X = Y
+	Z = X
+VALEU
+VALEU
 --------------------
-[32mRunning test 'tests/t1.p1'...[39m
+[32mRunning test 'tests/t1.cara'...[39m
 
  Loaded input symbols to registers:
 
@@ -22,10 +26,10 @@ FIM
  
  Labels	 Command
 -------------------------------------------------
-.globl  provolone
+.globl  cariocaScript
 Sf:  .string "Output:%d\n"
 
-provolone:
+cariocaScript:
 	 pushq %rbp
 	 movq %rsp,%rbp 
 
@@ -40,6 +44,11 @@ L2:
   	 cmpl %r0,%r3
  	 jne L2 
 
+ 	 cmpl $0,%r1 
+	 je L5
+	 movl %r1, %r0 
+	 movl %r0, %r2 
+L5:
  	 movq $Sf, %rdi
 	 movl %r2, %esi
 	 call printf

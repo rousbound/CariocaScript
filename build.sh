@@ -8,5 +8,5 @@ echo --------------------
 cat ./$1
 echo --------------------
 echo "\e[32mRunning test '$1'...\e[39m"
-./bin/provolone $1
+./bin/cariocaScript $1
 echo "\e[32mEnd of Build\e[39m"

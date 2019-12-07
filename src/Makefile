@@ -3,21 +3,21 @@
 CFLAGS = -w
 BINFLDR = ../bin
 
-all: setup $(BINFLDR)/provolone tests
+all: setup $(BINFLDR)/cariocaScript tests
 
 setup: $(BINFLDR)
 
 $(BINFLDR):
 	mkdir -p $(BINFLDR)
 
-lex.yy.c: provolone.l provolone.tab.h
-	flex provolone.l
+lex.yy.c: cariocaScript.l cariocaScript.tab.h
+	flex cariocaScript.l
 
-provolone.tab.c provolone.tab.h: provolone.y utils.h
-	bison -d provolone.y
+cariocaScript.tab.c cariocaScript.tab.h: cariocaScript.y utils.h
+	bison -d cariocaScript.y
 
-$(BINFLDR)/provolone: lex.yy.c provolone.tab.c provolone.tab.h utils.o
-	gcc provolone.tab.c lex.yy.c utils.o -o $(BINFLDR)/provolone $(CFLAGS)
+$(BINFLDR)/cariocaScript: lex.yy.c cariocaScript.tab.c cariocaScript.tab.h utils.o
+	gcc cariocaScript.tab.c lex.yy.c utils.o -o $(BINFLDR)/cariocaScript $(CFLAGS)
 
 utils.o: utils.c utils.h
 	gcc -c utils.c -o utils.o $(CFLAGS)

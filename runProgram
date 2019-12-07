@@ -1,8 +1,8 @@
 #!/bin/bash
 
-./build.sh tests/$1 > program/debug.p1
-./build.sh tests/$1 | ./extractProgram > program/temp.p1
+./build.sh tests/$1 > program/debug.cara
+./build.sh tests/$1 | ./extractProgram > program/temp.cara
 cd program
-cp temp.p1 provolone.s
-gcc -no-pie -o prog.out main.c provolone.s && ./prog.out
+cp temp.cara cariocaScript.s
+gcc -no-pie -o prog.out main.c cariocaScript.s && ./prog.out
 cd ..
