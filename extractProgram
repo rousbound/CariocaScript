@@ -1,0 +1,2 @@
+#!/bin/bash
+cat /dev/stdin | head  -n -1 | sed  '0,/Labels/d' | tail -n +2 > program.p1

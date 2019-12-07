@@ -52,18 +52,22 @@
 program: ENTRADA var_list SAIDA var_list cmds FIM
   {
     char * s_fim = (char *) malloc(sizeof(char)*32);
+    char * s_begin = (char *) malloc(sizeof(char)*64);
     if( !s_fim )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_fim," \t FIM\n");
+    sprintf(s_begin,".globl  main\n main:\n \t movq %rbp, %rsp\n\t pushq %rbp\n\t movq %rsp,%rbp \n\n");
+    sprintf(s_fim," \t popq %rbp\n\t ret");
+		
     $$ = concat(
       "\n Loaded input symbols to registers:\n\n",
       $2,
       "\n Loaded output symbols to registers:\n\n",
       $4,
       " \n Labels\t Command\n-------------------------------------------------\n",
+			s_begin,
       $5,
       s_fim
     );
@@ -76,6 +80,7 @@ program: ENTRADA var_list SAIDA var_list cmds FIM
     free($4);
     free($5);
     free(s_fim);
+    free(s_begin);
     printf("%s\n",$$); // show program
     free($$);
   };
@@ -151,10 +156,10 @@ cmd: FACA var_ref VEZES cmds FIM
     }
 		int iterator = symtab_size;
 		int stack = symtab_size+1;
-    sprintf(s_copia,"  \t COPIA(%r%d,%r%d)\nL%d:\n",$2,iterator,label);
-    sprintf(s_inc,"  \t INC(%r%d) \n",iterator);
+    sprintf(s_copia,"  \t movl %r%d,%r%d\nL%d:\n",$2,iterator,label);
+    sprintf(s_inc,"  \t addl $1,%r%d \n",iterator);
 
-    sprintf(s_if,"  \t IF(%r%d,$0)\n \t jne L%d \n",iterator,label);
+    sprintf(s_if,"  \t cmpl $0,%r%d\n \t jne L%d \n",iterator,label);
     sprintf(s_exit,"\n",label);
     $$ = concat(
       s_copia,
@@ -180,7 +185,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_enquanto,"L%d:\n\t IF(%r%d,$0)\n\t je L%d\n",label,$2,label+1);
+    sprintf(s_enquanto,"L%d:\n\t cmpl $0, %r%d\n\t je L%d\n",label,$2,label+1);
     sprintf(s_fim,"\t je L%d\nL%d:\n",label,label+1);
     sprintf(s_exit," \n");
     $$ = concat(
@@ -206,7 +211,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if," \t IF(%r%d,$0)\n\t je L%d\n",$2,label);
+    sprintf(s_if," \t cmpl $0,%r%d \n\t je L%d\n",$2,label);
     sprintf(s_else,"\t jmp L%d\nL%d:\n",label+1,label);
     sprintf(s_exit,"L%d:\n",label+1);
     $$ = concat(
@@ -232,7 +237,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if," \t IF(%r%d,$0)\n\t je L%d\n",$2,label);
+    sprintf(s_if," \t cmpl $0,%r%d \n\t je L%d\n",$2,label);
     sprintf(s_exit,"L%d:\n",label);
     $$ = concat(
       s_if,
@@ -254,7 +259,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_attr,"\t COPIA(%r%d, %r%d) \n",state,$3,$1);
+    sprintf(s_attr,"\t movl %r%d, %r%d \n",state,$3,$1);
     $$ = s_attr;
   }
   | INC OPEN_PAR var_ref CLOSE_PAR
@@ -265,7 +270,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_inc,"\t INC(%r%d) \n",$3);
+    sprintf(s_inc,"\t addl $1, %r%d \n",$3);
     $$ = s_inc;
   }
   | ZERA OPEN_PAR var_ref CLOSE_PAR
@@ -276,7 +281,7 @@ cmd: FACA var_ref VEZES cmds FIM
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_zero," \t ZERA(%r%d)\n",$3);
+    sprintf(s_zero," \t movl $0, %r%d\n",$3);
     $$ = s_zero;
   };
 %%
