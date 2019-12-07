@@ -1,0 +1,49 @@
+[32mMaking executables...[39m
+Original Program
+--------------------
+ENTRADA X,Y
+SAIDA Z
+ZERA(Z)
+FACA X VEZES
+	Z += Y
+FIM
+FIM
+--------------------
+[32mRunning test 'tests/t1.p1'...[39m
+
+ Loaded input symbols to registers:
+
+  -Variable assigned to register %r0.
+  -Variable assigned to register %r1.
+
+ Loaded output symbols to registers:
+
+  -Variable assigned to register %r2.
+ 
+ Labels	 Command
+-------------------------------------------------
+.globl  provolone
+Sf:  .string "Output:%d\n"
+
+provolone:
+	 pushq %rbp
+	 movq %rsp,%rbp 
+
+ 	 movl %edi, %r0
+	 movl %esi, %r1
+
+ 	 movl $0, %r2
+  	 movl $0,%r3
+L2:
+  	 addl $1,%r3 
+	 addl %r1, %r2 
+  	 cmpl %r0,%r3
+ 	 jne L2 
+
+ 	 movq $Sf, %rdi
+	 movl %r2, %esi
+	 call printf
+ 	 movq %rbp, %rsp
+	 popq %rbp
+	 ret
+[32mEnd of Build[39m

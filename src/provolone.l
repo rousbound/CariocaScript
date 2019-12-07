@@ -47,6 +47,8 @@ ZERA            { return ZERA; }
 \(              { return OPEN_PAR; }
 \)              { return CLOSE_PAR; }
 \=              { return EQ; }
+\+=							{ return PLUS_EQ; }
+\-=							{ return MINUS_EQ; }
 \n              { ++line_num; }
 .               ;
 %%

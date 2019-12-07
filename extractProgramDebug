@@ -1,7 +1,10 @@
 #!/bin/bash
 cat /dev/stdin | head  -n -1 | sed  '0,/Labels/d' | tail -n +2 > program/temp.p1
+echo Original Program
+echo --------------
+cd program
+cat temp.p1
 #sed -i 's/%r[[:digit:]]/ 1&d/g' temp.p1
-cd program	
 sed -i 's/%r0/ %r0 /g' temp.p1
 sed -i 's/%r1/ %r1 /g' temp.p1
 sed -i 's/%r2/ %r2 /g' temp.p1
@@ -16,5 +19,7 @@ sed -i 's/ %r3 /%r13d/g' temp.p1
 sed -i 's/ %r4 /%r14d/g' temp.p1
 sed -i 's/ %r5 /%r15d/g' temp.p1
 sed -i 's/,%/, %/g' temp.p1
+echo Extracted Program
+echo ------------------
 cat temp.p1
 cd ..
