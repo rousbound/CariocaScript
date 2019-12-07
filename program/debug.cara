@@ -3,13 +3,10 @@ Original Program
 --------------------
 CHEGAMAIS X,Y
 CAIFORA Z
-ZERA(Z)
+Z=X
+RELAXOU(Z)
 MARCA X RAPIDAO
 	Z += Y
-VALEU
-SEPA Y ENTAO
-	X = Y
-	Z = X
 VALEU
 VALEU
 --------------------
@@ -27,32 +24,28 @@ VALEU
  Labels	 Command
 -------------------------------------------------
 .globl  cariocaScript
-Sf:  .string "Output:%d\n"
+ Sf:  .string "Output:%d\n"
 
-cariocaScript:
+ cariocaScript:
 	 pushq %rbp
-	 movq %rsp,%rbp 
+	 movq %rsp,%rbp
 
  	 movl %edi, %r0
 	 movl %esi, %r1
 
+	 movl %r0, %r2 
  	 movl $0, %r2
   	 movl $0,%r3
-L2:
+L3:
   	 addl $1,%r3 
 	 addl %r1, %r2 
   	 cmpl %r0,%r3
- 	 jne L2 
+ 	 jne L3 
 
- 	 cmpl $0,%r1 
-	 je L5
-	 movl %r1, %r0 
-	 movl %r0, %r2 
-L5:
  	 movq $Sf, %rdi
 	 movl %r2, %esi
 	 call printf
- 	 movq %rbp, %rsp
+    	 movq %rbp, %rsp
 	 popq %rbp
 	 ret
 [32mEnd of Build[39m

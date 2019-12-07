@@ -16,16 +16,17 @@
 CHEGAMAIS         { return CHEGAMAIS; }
 CAIFORA           { return CAIFORA; }
 VALEU             { return VALEU; }
-MARCA            { return MARCA; }
-RAPIDAO            { return RAPIDAO; }
-FACA            { return FACA; }
-VEZES           { return VEZES; }
-ENQUANTO        { return ENQUANTO; }
+MARCA             { return MARCA; }
+RAPIDAO           { return RAPIDAO; }
+FACA            	{ return FACA; }
+ENQUANTO        	{ return ENQUANTO; }
 SEPA              { return SEPA; }
-ENTAO           { return ENTAO; }
-SENAO           { return SENAO; }
-INC             { return INC; }
-ZERA            { return ZERA; }
+TA_LGD            { return TA_LGD; }
+ENTAO           	{ return ENTAO; }
+SENAO           	{ return SENAO; }
+RELAXOU           { return RELAXOU; }
+FALATU           { return FALATU; }
+
 [a-zA-Z]+       {
   for( int i = 0 ; i < symtab_size ; i++ )
   {
@@ -43,11 +44,13 @@ ZERA            { return ZERA; }
   {
     symtab[symtab_size] = strdup(yytext);
     yylval.ival = symtab_size;
-  }
+ }
   return ID;
 }
 \(              { return OPEN_PAR; }
 \)              { return CLOSE_PAR; }
+\{              { return OPEN_KEY; }
+\}              { return CLOSE_KEY; }
 \=              { return EQ; }
 \+=							{ return PLUS_EQ; }
 \-=							{ return MINUS_EQ; }

@@ -30,15 +30,19 @@
 %token FACA
 %token MARCA
 %token RAPIDAO
-%token VEZES
 %token ENQUANTO
 %token SEPA
+%token FALATU
+%token TA_LGD
 %token ENTAO
 %token SENAO
-%token INC
-%token ZERA
+%token RELAXOU
+
 %token OPEN_PAR
 %token CLOSE_PAR
+%token OPEN_KEY
+%token CLOSE_KEY
+
 %token EQ
 %token PLUS
 %token MINUS
@@ -56,19 +60,31 @@
 %%
 program: CHEGAMAIS var_list CAIFORA var_list cmds VALEU
   {
-    char * s_fim = (char *) malloc(sizeof(char)*32);
-    char * s_begin = (char *) malloc(sizeof(char)*64);
-    char * s_load = (char *) malloc(sizeof(char)*64);
+    char * s_fim = (char *) malloc(sizeof(char)*64);
+    char * s_begin = (char *) malloc(sizeof(char)*128);
+    char * s_load = (char *) malloc(sizeof(char)*128);
     char * s_printf = (char *) malloc(sizeof(char)*128);
-    if( !s_fim )
+    if( !s_fim || !s_begin || !s_load || !s_printf)
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_begin,".globl  cariocaScript\nSf:  .string \"Output:%%d\\n\"\n\ncariocaScript:\n\t pushq %rbp\n\t movq %rsp,%rbp \n\n");
-    sprintf(s_load," \t movl %%edi, %r0\n\t movl %%esi, %r1\n\n");
-    sprintf(s_fim," \t movq %rbp, %rsp\n\t popq %rbp\n\t ret");
-		sprintf(s_printf," \t movq $Sf, %rdi\n\t movl %r2, %%esi\n\t call printf\n");
+
+		sprintf(s_begin,     ".globl  cariocaScript\n "
+												 "Sf:  .string \"Output:%%d\\n\"\n\n "
+												 "cariocaScript:\n\t "
+												 "pushq %rbp\n\t "
+												 "movq %rsp,%rbp\n\n");
+
+		sprintf(s_load,  " \t movl %%edi, %r0\n\t " 
+												 "movl %%esi, %r1\n\n");
+			
+		sprintf(s_fim,"    \t movq %rbp, %rsp\n\t "
+												 "popq %rbp\n\t ret");
+
+		sprintf(s_printf," \t movq $Sf, %rdi\n\t "
+												 "movl %r2, %%esi\n\t "
+												 "call printf\n"); 
 		
     $$ = concat(
       "\n Loaded input symbols to registers:\n\n",
@@ -161,18 +177,23 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
     char * s_if = (char *) malloc(sizeof(char)*64);
     char * s_inc = (char *) malloc(sizeof(char)*32);
     char * s_exit = (char *) malloc(sizeof(char)*8);
-    if( !s_copia || !s_if || !s_inc )
+    if( !s_copia || !s_if || !s_inc || !s_exit )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
 		int iterator = symtab_size;
-		int stack = symtab_size+1;
-    sprintf(s_copia,"  \t movl $0,%r%d\nL%d:\n",iterator,label);
-    sprintf(s_inc,"  \t addl $1,%r%d \n",iterator);
 
-    sprintf(s_if,"  \t cmpl %r%d,%r%d\n \t jne L%d \n",$2,iterator,label);
+    sprintf(s_copia,"  \t movl $0,%r%d\n"
+										"L%d:\n",iterator,label);
+
+    sprintf(s_inc,  "  \t addl $1,%r%d \n",iterator);
+
+    sprintf(s_if,   "  \t cmpl %r%d,%r%d\n" 
+								     " \t jne L%d \n",$2,iterator,label);
+
     sprintf(s_exit,"\n",label);
+
     $$ = concat(
       s_copia,
 			s_inc,
@@ -185,7 +206,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    free(s_copia); free(s_if); free($4); free(s_inc); free(s_exit);
+    free(s_copia); free(s_inc); free($4); free(s_if);  free(s_exit);
   }
   | ENQUANTO var_ref FACA cmds VALEU
   {
@@ -197,9 +218,15 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_enquanto,"L%d:\n\t cmpl $0, %r%d\n\t je L%d\n",label,$2,label+1);
-    sprintf(s_fim,"\t je L%d\nL%d:\n",label,label+1);
-    sprintf(s_exit," \n");
+    sprintf(s_enquanto,   "L%d:\n\t "
+											    "cmpl $0, %r%d\n\t "
+											    "je L%d\n",label,$2,label+1);
+
+    sprintf(s_fim,     "\t je L%d\n"
+									        "L%d:\n",label,label+1);
+
+    sprintf(s_exit,       " \n");
+
     $$ = concat(
       s_enquanto,
       $4,
@@ -223,9 +250,14 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if," \t cmpl $0,%r%d \n\t je L%d\n",$2,label);
-    sprintf(s_else,"\t jmp L%d\nL%d:\n",label+1,label);
+    sprintf(s_if," \t cmpl $0,%r%d \n\t "
+								 "je L%d\n",$2,label);
+
+    sprintf(s_else,"\t jmp L%d\n"
+									 "L%d:\n",label+1,label);
+
     sprintf(s_exit,"L%d:\n",label+1);
+
     $$ = concat(
       s_if,
       $4,
@@ -240,7 +272,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
     }
     free(s_if); free($4); free(s_else); free($6); free(s_exit);
   }
-  | SEPA var_ref ENTAO cmds VALEU
+  | SEPA var_ref TA_LGD cmds VALEU
   {
     char * s_if = (char *) malloc(sizeof(char)*64);
     char * s_exit = (char *) malloc(sizeof(char)*8);
@@ -249,8 +281,12 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if," \t cmpl $0,%r%d \n\t je L%d\n",$2,label);
-    sprintf(s_exit,"L%d:\n",label);
+
+    sprintf(s_if,    " \t cmpl $0,%r%d "
+								    "\n\t je L%d\n",$2,label);
+
+    sprintf(s_exit,      "L%d:\n",label);
+
     $$ = concat(
       s_if,
       $4,
@@ -285,7 +321,18 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
     sprintf(s_inc,"\t addl %r%d, %r%d \n",$3,$1);
     $$ = s_inc;
   }
-  | ZERA OPEN_PAR var_ref CLOSE_PAR
+  | var_ref MINUS_EQ var_ref
+  {
+    char * s_inc = (char *) malloc(sizeof(char)*48);
+    if( !s_inc )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    sprintf(s_inc,"\t subl %r%d, %r%d \n",$3,$1);
+    $$ = s_inc;
+  }
+  | RELAXOU OPEN_PAR var_ref CLOSE_PAR
   {
     char * s_zero = (char *) malloc(sizeof(char)*48);
     if( !s_zero )
@@ -295,6 +342,23 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
     }
     sprintf(s_zero," \t movl $0, %r%d\n",$3);
     $$ = s_zero;
+  }
+  | FALATU OPEN_PAR var_ref CLOSE_PAR
+  {
+    char * s_print = (char *) malloc(sizeof(char)*96);
+    if( !s_print )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+		sprintf(s_print," \t movq $Sf, %rdi\n\t "
+									     "movl %r%d, %%ebx\n\t "
+											 "movl %%ebx, %%esi\n\t "
+											 "call printf\n\t " 
+											 "movl %%ebx, %r%d\n\n ",$3,$3);
+
+    $$ = s_print;
+
   };
 %%
 
