@@ -46,6 +46,7 @@
 
 %token EQ
 %token PLUS
+%token PLUS_PLUS
 %token MINUS
 %token PLUS_EQ
 %token MINUS_EQ
@@ -239,7 +240,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
     }
     free(s_enquanto); free($4); free(s_fim); free(s_exit);
   }
-  | SEPA var_ref ENTAO cmds SENAO cmds VALEU
+  | SEPA var_ref TA_LGD cmds SENAO cmds VALEU
   {
     char * s_if = (char *) malloc(sizeof(char)*64);
     char * s_else = (char *) malloc(sizeof(char)*32);
@@ -308,6 +309,17 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
     }
     sprintf(s_attr,"\t movl %r%d, %r%d \n",$3,$1);
     $$ = s_attr;
+  }
+  | var_ref PLUS_PLUS 
+  {
+    char * s_pp = (char *) malloc(sizeof(char)*64);
+    if( !s_pp )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    sprintf(s_pp,"\t addl $1, %r%d \n",$1);
+    $$ = s_pp;
   }
   | var_ref PLUS_EQ var_ref
   {

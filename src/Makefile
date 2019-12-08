@@ -3,7 +3,7 @@
 CFLAGS = -w
 BINFLDR = ../bin
 
-all: setup $(BINFLDR)/cariocaScript tests
+all: setup $(BINFLDR)/cariocaScript 
 
 setup: $(BINFLDR)
 

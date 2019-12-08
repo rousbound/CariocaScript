@@ -54,6 +54,7 @@ FALATU           { return FALATU; }
 \}              { return CLOSE_KEY; }
 \=              { return EQ; }
 \+=							{ return PLUS_EQ; }
+\++							{ return PLUS_PLUS; }
 \-=							{ return MINUS_EQ; }
 \n              { ++line_num; }
 .               ;
