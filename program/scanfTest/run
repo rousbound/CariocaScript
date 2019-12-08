@@ -1,0 +1,3 @@
+#!/bin/bash
+
+gcc -no-pie main.c cariocaScript.s

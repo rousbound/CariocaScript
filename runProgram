@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ./build.sh tests/$1 > program/debug.cara
-./build.sh tests/$1 | ./extractProgram > program/temp.cara
+./build.sh tests/$1 | ./extractProgram2 > program/temp.cara
 cd program
 cp temp.cara cariocaScript.s
 gcc -no-pie -o prog.out main.c cariocaScript.s && ./prog.out

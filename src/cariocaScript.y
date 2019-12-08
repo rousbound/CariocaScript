@@ -47,6 +47,7 @@
 %token EQ
 %token PLUS
 %token PLUS_PLUS
+%token MINUS_MINUS
 %token MINUS
 %token PLUS_EQ
 %token MINUS_EQ
@@ -54,16 +55,17 @@
 %token <ival> ID
 %type <sval> program
 %type <sval> var_list
+%type <sval> input
 %type <sval> var_def
 %type <sval> var_ref
 %type <sval> cmds
 %type <sval> cmd
 
 %%
-program: CHEGAMAIS var_list CARAI cmds VALEU
+program: CHEGAMAIS input CARAI cmds VALEU
   {
     char * s_fim = (char *) malloc(sizeof(char)*64);
-    char * s_begin = (char *) malloc(sizeof(char)*128);
+    char * s_begin = (char *) malloc(sizeof(char)*256);
     char * s_load = (char *) malloc(sizeof(char)*128);
     char * s_printf = (char *) malloc(sizeof(char)*128);
     if( !s_fim || !s_begin || !s_load || !s_printf)
@@ -71,14 +73,21 @@ program: CHEGAMAIS var_list CARAI cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
+		
+		int total_tabsize = symtab_size+2;
+		int local_variable_stacksize = (total_tabsize*8)+((total_tabsize*8)%16);
 
 		sprintf(s_begin,     ".globl  cariocaScript\n "
+												 "Si:  .string \"Input: \"\n\n "
+												 "Sii:  .string \"%%d\"\n\n "
+												 "Nl:  .string \"\\n\"\n\n "
 												 "Sf:  .string \"Output:%%d\\n\"\n\n "
 												 "cariocaScript:\n\t "
 												 "pushq %rbp\n\t "
-												 "movq %rsp,%rbp\n\n");
+												 "movq %rsp,%rbp\n\t "
+												 "subq $%d, %rsp\n\n\t ",local_variable_stacksize);
 
-		sprintf(s_load,  " \t movl %%edi, %r0\n\t " 
+		sprintf(s_load,      "movl %%edi, %r0\n\t " 
 												 "movl %%esi, %r1\n\n");
 			
 		sprintf(s_fim,"    \t movq %rbp, %rsp\n\t "
@@ -90,10 +99,10 @@ program: CHEGAMAIS var_list CARAI cmds VALEU
 		
     $$ = concat(
       "\n Loaded symbols to registers:\n\n",
-      $2,
       " \n Labels\t Command\n-------------------------------------------------\n",
 			s_begin,
-			s_load,
+      $2,
+			//s_load,
       $4,
 			//s_printf,
       s_fim
@@ -112,9 +121,22 @@ program: CHEGAMAIS var_list CARAI cmds VALEU
     printf("%s\n",$$); // show program
     free($$);
   };
-var_list: var_list var_def
+input: var_list{
+    char * s_printf = (char *) malloc(sizeof(char)*32);
+    char * s_newline = (char *) malloc(sizeof(char)*32);
+		sprintf(s_printf,"movq $Si, %rdi\n\t "
+										"call printf\n\t "); 
+
+		sprintf(s_newline,"movq $Nl, %rdi\n\t "
+										"call printf\n\n\t "); 
+		$$ = concat(s_printf, $1, s_newline);
+		free(s_printf); free($1); free(s_newline);
+};
+ var_list: var_list var_def
   {
+
     $$ = concat($1,$2);
+
     if( !$$ )
     {
       yyerror(MEM_ERROR);
@@ -135,15 +157,20 @@ var_def: ID
     }
     else
     {
-      char * s_id = (char *) malloc(sizeof(char)*32);
+      char * s_id = (char *) malloc(sizeof(char)*64);
       if( !s_id )
       {
         yyerror(MEM_ERROR);
         YYERROR;
       }
-      sprintf(s_id,"  -Variable assigned to register %r%d.\n",$1);
-      $$ = s_id;
       symtab_size++;
+			int offset = 8*($1+1);
+
+      sprintf(s_id,  "movq $Sii, %rdi\n\t "
+									   "leaq -%d(%%rbp), %%rsi\n\t "
+										 "call scanf\n\n\t ",offset);
+
+      $$ = s_id;
     }
   }
 var_ref: ID
@@ -184,15 +211,15 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
     }
 		int iterator = symtab_size;
 
-    sprintf(s_copia,"  \t movl $0,%r%d\n"
-										"L%d:\n",iterator,label);
+    sprintf(s_copia,"  \t movl $0,%rc12d\n"
+										"L%d:\n",label);
 
-    sprintf(s_inc,  "  \t addl $1,%r%d \n",iterator);
+    sprintf(s_inc,  "  \t addl $1,%rc12d \n");
 
-    sprintf(s_if,   "  \t cmpl %r%d,%r%d\n" 
-								     " \t jne L%d \n",$2,iterator,label);
+    sprintf(s_if,   "  \t cmpl %rc12d,%r%d\n" 
+								     " \t jne L%d \n",$2,label);
 
-    sprintf(s_exit,"\n",label);
+    sprintf(s_exit,"\n\t ",label);
 
     $$ = concat(
       s_copia,
@@ -222,7 +249,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
 											    "cmpl $0, %r%d\n\t "
 											    "je L%d\n",label,$2,label+1);
 
-    sprintf(s_fim,     "\t je L%d\n"
+    sprintf(s_fim,     "\t jmp L%d\n"
 									        "L%d:\n",label,label+1);
 
     sprintf(s_exit,       " \n");
@@ -301,14 +328,16 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
   }
   | var_ref EQ var_ref
   {
+    char * s_temp = (char *) malloc(sizeof(char)*64);
     char * s_attr = (char *) malloc(sizeof(char)*64);
     if( !s_attr )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_attr,"\t movl %r%d, %r%d \n",$3,$1);
-    $$ = s_attr;
+    sprintf(s_temp,"\t movl %r%d, %rc12d \n",$3);
+    sprintf(s_attr,"\t movl %rc12d, %r%d \n",$1);
+    $$ = concat(s_temp,s_attr);
   }
   | var_ref PLUS_PLUS 
   {
@@ -320,6 +349,17 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
     }
     sprintf(s_pp,"\t addl $1, %r%d \n",$1);
     $$ = s_pp;
+  }
+  | var_ref MINUS_MINUS 
+  {
+    char * s_mm = (char *) malloc(sizeof(char)*64);
+    if( !s_mm )
+    {
+      yyerror(MEM_ERROR);
+      YYERROR;
+    }
+    sprintf(s_mm,"\t subl $1, %r%d \n",$1);
+    $$ = s_mm;
   }
   | var_ref PLUS_EQ var_ref
   {
@@ -351,7 +391,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_zero," \t movl $0, %r%d\n",$3);
+    sprintf(s_zero,"movl $0, %r%d\n",$3);
     $$ = s_zero;
   }
   | FALATU OPEN_PAR var_ref CLOSE_PAR
@@ -363,10 +403,8 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       YYERROR;
     }
 		sprintf(s_print," \t movq $Sf, %rdi\n\t "
-									     "movl %r%d, %%ebx\n\t "
-											 "movl %%ebx, %%esi\n\t "
-											 "call printf\n\t ",$3,$3); 
-											 //"movl %%ebx, %r%d\n\n ",$3,$3);
+											 "movl %r%d, %%esi\n\t "
+											 "call printf\n ",$3,$3); 
 
     $$ = s_print;
 
