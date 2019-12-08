@@ -2,7 +2,7 @@
 make: Nothing to be done for 'all'.
 Original Program
 --------------------
-CHEGAMAIS X, Y, Z CARAI
+CHEGAMAIS X, Y, Z, A, B CARAI
 SEPA X TA_LGD
   SEPA Y TA_LGD
    	X++ 
@@ -25,6 +25,9 @@ VALEU
 FALATU(X)
 FALATU(Y)
 FALATU(Z)
+FALATU(A)
+B++
+FALATU(B)
 VALEU
 
 --------------------
@@ -61,6 +64,14 @@ VALEU
 
 	 movq $Sii, %rdi
 	 leaq -24(%rbp), %rsi
+	 call scanf
+
+	 movq $Sii, %rdi
+	 leaq -32(%rbp), %rsi
+	 call scanf
+
+	 movq $Sii, %rdi
+	 leaq -40(%rbp), %rsi
 	 call scanf
 
 	 movq $Nl, %rdi
@@ -102,6 +113,13 @@ L10:
 	 call printf
   	 movq $Sf, %rdi
 	 movl %r2, %esi
+	 call printf
+  	 movq $Sf, %rdi
+	 movl %r3, %esi
+	 call printf
+ 	 addl $1, %r4 
+ 	 movq $Sf, %rdi
+	 movl %r4, %esi
 	 call printf
      	 movq %rbp, %rsp
 	 popq %rbp

@@ -2,7 +2,7 @@
   #include <string.h>
   #include "cariocaScript.tab.h"
 
-  #define MAX_VAR_CNT 4
+  #define MAX_VAR_CNT 8
 
   extern void yyerror(const char *s);
   extern int symtab_size;

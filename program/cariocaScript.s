@@ -26,6 +26,14 @@
 	 leaq -24(%rbp), %rsi
 	 call scanf
 
+	 movq $Sii, %rdi
+	 leaq -32(%rbp), %rsi
+	 call scanf
+
+	 movq $Sii, %rdi
+	 leaq -40(%rbp), %rsi
+	 call scanf
+
 	 movq $Nl, %rdi
 	 call printf
 
@@ -65,6 +73,13 @@ L10:
 	 call printf
   	 movq $Sf, %rdi
 	 movl -24(%rbp), %esi
+	 call printf
+  	 movq $Sf, %rdi
+	 movl -32(%rbp), %esi
+	 call printf
+ 	 addl $1, -40(%rbp) 
+ 	 movq $Sf, %rdi
+	 movl -40(%rbp), %esi
 	 call printf
      	 movq %rbp, %rsp
 	 popq %rbp

@@ -75,7 +75,7 @@ program: CHEGAMAIS input CARAI cmds VALEU
     }
 		
 		int total_tabsize = symtab_size+2;
-		int local_variable_stacksize = (total_tabsize*8)+((total_tabsize*8)%16);
+		int local_variable_stacksize = (symtab_size*8)+((symtab_size*8)%16);
 
 		sprintf(s_begin,     ".globl  cariocaScript\n "
 												 "Si:  .string \"Input: \"\n\n "
@@ -404,7 +404,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
     }
 		sprintf(s_print," \t movq $Sf, %rdi\n\t "
 											 "movl %r%d, %%esi\n\t "
-											 "call printf\n ",$3,$3); 
+											 "call printf\n ",$3); 
 
     $$ = s_print;
 

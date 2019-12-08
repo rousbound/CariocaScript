@@ -13,8 +13,11 @@ sed -i 's/ %r0 /-8(%rbp)/g' temp.cara
 sed -i 's/ %r1 /-16(%rbp)/g' temp.cara
 sed -i 's/ %r2 /-24(%rbp)/g' temp.cara
 sed -i 's/ %r3 /-32(%rbp)/g' temp.cara
-sed -i 's/ %r4 /-48(%rbp)/g' temp.cara
-sed -i 's/ %r5 /-56(%rbp)/g' temp.cara
+sed -i 's/ %r4 /-40(%rbp)/g' temp.cara
+sed -i 's/ %r5 /-48(%rbp)/g' temp.cara
+sed -i 's/ %r6 /-56(%rbp)/g' temp.cara
+sed -i 's/ %r7 /-64(%rbp)/g' temp.cara
+sed -i 's/ %r8 /-72(%rbp)/g' temp.cara
 
 sed -i 's/%rc12d/ %r12d /g' temp.cara
 
