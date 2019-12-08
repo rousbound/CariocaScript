@@ -1,7 +1,4 @@
 [32mMaking executables...[39m
-bison -d cariocaScript.y
-flex cariocaScript.l
-gcc cariocaScript.tab.c lex.yy.c utils.o -o ../bin/cariocaScript -w
 Original Program
 --------------------
 CHEGAMAIS X,Y,Z CARAI
