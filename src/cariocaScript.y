@@ -87,22 +87,15 @@ program: CHEGAMAIS input CARAI cmds VALEU
 												 "movq %rsp,%rbp\n\t "
 												 "subq $%d, %rsp\n\n\t ",local_variable_stacksize);
 
-		sprintf(s_load,      "movl %%edi, %r0\n\t " 
-												 "movl %%esi, %r1\n\n");
 			
 		sprintf(s_fim,"    \t movq %rbp, %rsp\n\t "
 												 "popq %rbp\n\t ret");
 
-		sprintf(s_printf," \t movq $Sf, %rdi\n\t "
-												 "movl %r2, %%esi\n\t "
-												 "call printf\n"); 
 		
     $$ = concat(
-      "\n Loaded symbols to registers:\n\n",
       " \n Labels\t Command\n-------------------------------------------------\n",
 			s_begin,
       $2,
-			//s_load,
       $4,
 			//s_printf,
       s_fim
@@ -191,7 +184,6 @@ cmds: cmds cmd
       YYERROR;
     }
     free($1); free($2);
-		label++;
   }
   | cmd
   {
@@ -219,7 +211,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
     sprintf(s_if,   "  \t cmpl %rc12d,%r%d\n" 
 								     " \t jne L%d \n",$2,label);
 
-    sprintf(s_exit,"\n\t ",label);
+    sprintf(s_exit,"\n",label);
 
     $$ = concat(
       s_copia,
@@ -250,9 +242,9 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
 											    "je L%d\n",label,$2,label+1);
 
     sprintf(s_fim,     "\t jmp L%d\n"
-									        "L%d:\n",label,label+1);
+											 "L%d:\n",label,label+1);
 
-    sprintf(s_exit,       " \n");
+    sprintf(s_exit,    "\n");
 
     $$ = concat(
       s_enquanto,
@@ -277,7 +269,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if," \t cmpl $0,%r%d \n\t "
+    sprintf(s_if,"cmpl $0,%r%d \n\t "
 								 "je L%d\n",$2,label);
 
     sprintf(s_else,"\t jmp L%d\n"
@@ -404,7 +396,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
     }
 		sprintf(s_print," \t movq $Sf, %rdi\n\t "
 											 "movl %r%d, %%esi\n\t "
-											 "call printf\n ",$3); 
+											 "call printf\n\n ",$3); 
 
     $$ = s_print;
 

@@ -22,19 +22,18 @@ ENQUANTO Z FACA
   VALEU 
  Z--
 VALEU
+
 FALATU(X)
 FALATU(Y)
 FALATU(Z)
 FALATU(A)
 B++
 FALATU(B)
+
 VALEU
 
 --------------------
 [32mRunning test 'tests/t3.cara'...[39m
-
- Loaded symbols to registers:
-
  
  Labels	 Command
 -------------------------------------------------
@@ -77,7 +76,7 @@ VALEU
 	 movq $Nl, %rdi
 	 call printf
 
-	  	 cmpl $0,%r0 
+	 cmpl $0,%r0 
 	 je L3
  	 cmpl $0,%r1 
 	 je L1
@@ -94,33 +93,38 @@ L5:
   	 cmpl %rc12d,%r0
  	 jne L5 
 
-	 L9:
-	 cmpl $0, %r2
-	 je L10
- 	 cmpl $0,%r0 
-	 je L7
-	 addl $1, %r0 
 L7:
+	 cmpl $0, %r2
+	 je L8
+ 	 cmpl $0,%r0 
+	 je L6
+	 addl $1, %r0 
+L6:
 	 subl $1, %r2 
-	 jmp L9
-L10:
- 
+	 jmp L7
+L8:
+
  	 movq $Sf, %rdi
 	 movl %r0, %esi
 	 call printf
+
   	 movq $Sf, %rdi
 	 movl %r1, %esi
 	 call printf
+
   	 movq $Sf, %rdi
 	 movl %r2, %esi
 	 call printf
+
   	 movq $Sf, %rdi
 	 movl %r3, %esi
 	 call printf
+
  	 addl $1, %r4 
  	 movq $Sf, %rdi
 	 movl %r4, %esi
 	 call printf
+
      	 movq %rbp, %rsp
 	 popq %rbp
 	 ret

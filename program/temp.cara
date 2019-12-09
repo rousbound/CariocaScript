@@ -37,7 +37,7 @@
 	 movq $Nl, %rdi
 	 call printf
 
-	  	 cmpl $0,-8(%rbp) 
+	 cmpl $0,-8(%rbp) 
 	 je L3
  	 cmpl $0,-16(%rbp) 
 	 je L1
@@ -54,33 +54,38 @@ L5:
   	 cmpl  %r12d ,-8(%rbp)
  	 jne L5 
 
-	 L9:
-	 cmpl $0, -24(%rbp)
-	 je L10
- 	 cmpl $0,-8(%rbp) 
-	 je L7
-	 addl $1, -8(%rbp) 
 L7:
+	 cmpl $0, -24(%rbp)
+	 je L8
+ 	 cmpl $0,-8(%rbp) 
+	 je L6
+	 addl $1, -8(%rbp) 
+L6:
 	 subl $1, -24(%rbp) 
-	 jmp L9
-L10:
- 
+	 jmp L7
+L8:
+
  	 movq $Sf, %rdi
 	 movl -8(%rbp), %esi
 	 call printf
+
   	 movq $Sf, %rdi
 	 movl -16(%rbp), %esi
 	 call printf
+
   	 movq $Sf, %rdi
 	 movl -24(%rbp), %esi
 	 call printf
+
   	 movq $Sf, %rdi
 	 movl -32(%rbp), %esi
 	 call printf
+
  	 addl $1, -40(%rbp) 
  	 movq $Sf, %rdi
 	 movl -40(%rbp), %esi
 	 call printf
+
      	 movq %rbp, %rsp
 	 popq %rbp
 	 ret
