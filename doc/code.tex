@@ -1,0 +1,114 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage{color}
+\usepackage[margin=0.8in]{geometry}
+
+\usepackage{tikz}
+\usepackage[portuguese]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=C,
+  aboveskip=1mm,
+  belowskip=1mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{\vspace{-2cm}CariocaScript}
+\author{Geraldo Luiz de Carvalho Pereira Junior}
+\date{}
+
+\begin{document}
+\maketitle
+
+
+\begin{itemize}
+	\item{\textbf{Curso:} INF 1022}
+	\item{\textbf{Semestre:} 2019.2}
+	\item{\textbf{Professor:} Edward Hermann Haeusler}
+	%\item{\textbf{Grupo:} }
+	%\begin{itemize}
+		%\item{Geraldo Luiz de Carvalho Pereira Junior}
+	%\end{itemize}
+\end{itemize}
+
+\section{Rodando o programa}
+
+Para rodar o programa é só executar o arquivo "Coe" passando o argumento de um programa com extensão ".cara":
+
+\begin{lstlisting}
+$ ./Coe tests/t3.cara
+\end{lstlisting}
+
+\section{Principais mudanças}
+
+A gramática da CariocaScript foi feita a partir da Provol-One:
+
+\bigskip
+\noindent
+program $\to$ ENTRADA varlist SAIDA varlist cmds FIM\\
+varlist $\to$ id varlist $|$ id\\
+cmds $\to$ cmd cmds $|$ cmd\\
+cmd $\to$ FACA id VEZES cmds FIM\\
+cmd $\to$ ENQUANTO id FACA cmds FIM\\
+cmd $\to$ SE id ENTAO cmds SENAO cmds $|$ SE id ENTAO cmds\\
+cmd $\to$ id = id $|$ INC(id) $|$ ZERA(id)
+
+\bigskip
+\noindent
+Que acabou se tornando:
+
+\bigskip
+\noindent
+program $\to$ CHEGAMAIS input NAMORAL varlist cmds VALEU\\
+input $\to$ varlist\\
+varlist $\to$ id varlist $|$ id\\
+cmds $\to$ cmd cmds $|$ cmd\\
+cmd $\to$ MARCA id RAPIDAO cmds VALEU\\
+cmd $\to$ ENQUANTO id FACA cmds VALEU\\
+cmd $\to$ SEPA id TA_LGD cmds SENAO cmds $|$ SE id VALEU cmds\\
+cmd $\to$ id = id $|$ id++ $|$ id-- $|$ RELAXOU(id) $|$ FALATU(id) $|$ id += id $|$ id -= id
+
+\section{Geração de Código}
+
+\subsection{Contagem de Labels e fluxo de controle}
+A geração de código da CariocaScript se dá em puro assembly. A maior
+dificuldade em montar um bloco de código em assembly é na tradução das
+instruções de controle de fluxo. O sistema é na verdade muito simples na
+maioria dos casos, apenas é necessário adicionar +1 a contagem das labels a
+cada cmd executado que tudo passa a encaixar perfeitamente(até então). Já com
+comandos como \textit{ENQUANTO id FACA cmds VALEU e SEPA id TA\_LGD cmds SENAO cmds},
+ é necessário fazer uma pequena alteração no sistema de contagem
+das labels, pois a instrução exige duas labels diferentes. Nas demais, como
+\textit{SEPA id TA\_LGD cmds VALEU} só é necessário referenciar a mesma label.
+
+\subsection{Administração de variáveis}
+Outra curiosidade é a administração de variáveis, que se dá através de alocação
+na pilha através de um cálculo simples. Todas as operações são feitas
+referenciando a pilha, apenas usando um registrador callee-saved quando
+necessário para fazer operações que são ilegais para dois endereços
+simultâneos, como \textit{movl -8(\%rbp), -16(\%rbp)}(que corresponde a instrução id = id
+, que é contornada por:
+
+
+\begin{lstlisting}
+movl -8(%rbp), %r12d
+movl %r12d, -16(%rbp)
+\end{lstlisting}
+\end{document}

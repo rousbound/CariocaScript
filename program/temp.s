@@ -1,15 +1,15 @@
 .globl  cariocaScript
- Si:  .string "Input: "
+ Si:  .string "Meu Brother: "
 
  Sii:  .string "%d"
 
  Nl:  .string "\n"
 
- Sf:  .string "Output:%d\n"
+ Sf:  .string "Meu Parcerasso:%d\n"
 
  cariocaScript:
 	 pushq %rbp
-	 movq %rsp, %rbp
+	 movq %rsp,%rbp
 	 subq $48, %rsp
 
 	 movq $Si, %rdi
@@ -47,11 +47,11 @@ L1:
 L3:
 	 addl $1, -16(%rbp) 
 L4:
-  	 movl $0, %r12d 
+  	 movl $0,%r12d
 L5:
-  	 addl $1, %r12d  
+  	 addl $1,%r12d 
 	 addl $1, -24(%rbp) 
-  	 cmpl  %r12d ,-8(%rbp)
+  	 cmpl %r12d,-8(%rbp)
  	 jne L5 
 
 L7:

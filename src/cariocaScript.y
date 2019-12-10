@@ -25,7 +25,7 @@
 }
 
 %token CHEGAMAIS
-%token CARAI
+%token NAMORAL
 %token CAIFORA
 %token VALEU
 %token FACA
@@ -62,7 +62,7 @@
 %type <sval> cmd
 
 %%
-program: CHEGAMAIS input CARAI cmds VALEU
+program: CHEGAMAIS input NAMORAL cmds VALEU
   {
     char * s_fim = (char *) malloc(sizeof(char)*64);
     char * s_begin = (char *) malloc(sizeof(char)*256);
@@ -74,14 +74,16 @@ program: CHEGAMAIS input CARAI cmds VALEU
       YYERROR;
     }
 		
-		int total_tabsize = symtab_size+2;
-		int local_variable_stacksize = (symtab_size*8)+((symtab_size*8)%16);
+		int local_variable_stacksize = (symtab_size*8)+      // The subq $%d instruction needs to be multiple of 16.
+																	((symtab_size*8)%16);  // If we have 4 variables that's 24 bytes,
+																												 // but the stack needs to be set to 32
+																												 // bytes.
 
 		sprintf(s_begin,     ".globl  cariocaScript\n "
-												 "Si:  .string \"Input: \"\n\n "
+												 "Si:  .string \"Meu Brother: \"\n\n "
 												 "Sii:  .string \"%%d\"\n\n "
 												 "Nl:  .string \"\\n\"\n\n "
-												 "Sf:  .string \"Output:%%d\\n\"\n\n "
+												 "Sf:  .string \"Meu Parcerasso:%%d\\n\"\n\n "
 												 "cariocaScript:\n\t "
 												 "pushq %rbp\n\t "
 												 "movq %rsp,%rbp\n\t "
@@ -93,11 +95,9 @@ program: CHEGAMAIS input CARAI cmds VALEU
 
 		
     $$ = concat(
-      " \n Labels\t Command\n-------------------------------------------------\n",
 			s_begin,
       $2,
       $4,
-			//s_printf,
       s_fim
     );
     if( !$$ )
@@ -107,7 +107,6 @@ program: CHEGAMAIS input CARAI cmds VALEU
     }
     free($2);
     free($4);
-    //free($5);
     free(s_fim);
     free(s_begin);
     free(s_load);
@@ -157,11 +156,10 @@ var_def: ID
         YYERROR;
       }
       symtab_size++;
-			int offset = 8*($1+1);
 
       sprintf(s_id,  "movq $Sii, %rdi\n\t "
 									   "leaq -%d(%%rbp), %%rsi\n\t "
-										 "call scanf\n\n\t ",offset);
+										 "call scanf\n\n\t ",getRbpOffset($1));
 
       $$ = s_id;
     }
@@ -201,15 +199,14 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-		int iterator = symtab_size;
 
-    sprintf(s_copia,"  \t movl $0,%rc12d\n"
+    sprintf(s_copia,"  \t movl $0,%%r12d\n"
 										"L%d:\n",label);
 
-    sprintf(s_inc,  "  \t addl $1,%rc12d \n");
+    sprintf(s_inc,  "  \t addl $1,%%r12d \n");
 
-    sprintf(s_if,   "  \t cmpl %rc12d,%r%d\n" 
-								     " \t jne L%d \n",$2,label);
+    sprintf(s_if,   "  \t cmpl %%r12d,-%d(%rbp)\n" 
+								     " \t jne L%d \n",getRbpOffset($2),label);
 
     sprintf(s_exit,"\n",label);
 
@@ -238,8 +235,8 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       YYERROR;
     }
     sprintf(s_enquanto,   "L%d:\n\t "
-											    "cmpl $0, %r%d\n\t "
-											    "je L%d\n",label,$2,label+1);
+											    "cmpl $0, -%d(%rbp)\n\t "
+											    "je L%d\n",label,getRbpOffset($2),label+1);
 
     sprintf(s_fim,     "\t jmp L%d\n"
 											 "L%d:\n",label,label+1);
@@ -269,8 +266,8 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_if,"cmpl $0,%r%d \n\t "
-								 "je L%d\n",$2,label);
+    sprintf(s_if,"cmpl $0,-%d(%rbp) \n\t "
+								 "je L%d\n",getRbpOffset($2),label);
 
     sprintf(s_else,"\t jmp L%d\n"
 									 "L%d:\n",label+1,label);
@@ -301,8 +298,8 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       YYERROR;
     }
 
-    sprintf(s_if,    " \t cmpl $0,%r%d "
-								    "\n\t je L%d\n",$2,label);
+    sprintf(s_if,    " \t cmpl $0,-%d(%rbp) "
+								    "\n\t je L%d\n",getRbpOffset($2),label);
 
     sprintf(s_exit,      "L%d:\n",label);
 
@@ -327,8 +324,8 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_temp,"\t movl %r%d, %rc12d \n",$3);
-    sprintf(s_attr,"\t movl %rc12d, %r%d \n",$1);
+    sprintf(s_temp,"\t movl -%d(%rbp), %%r12d \n",getRbpOffset($3));
+    sprintf(s_attr,"\t movl %%r12d, -%d(%rbp) \n",getRbpOffset($1));
     $$ = concat(s_temp,s_attr);
   }
   | var_ref PLUS_PLUS 
@@ -339,7 +336,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_pp,"\t addl $1, %r%d \n",$1);
+    sprintf(s_pp,"\t addl $1, -%d(%rbp) \n",getRbpOffset($1));
     $$ = s_pp;
   }
   | var_ref MINUS_MINUS 
@@ -350,7 +347,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_mm,"\t subl $1, %r%d \n",$1);
+    sprintf(s_mm,"\t subl $1, -%d(%rbp) \n",getRbpOffset($1));
     $$ = s_mm;
   }
   | var_ref PLUS_EQ var_ref
@@ -361,7 +358,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_inc,"\t addl %r%d, %r%d \n",$3,$1);
+    sprintf(s_inc,"\t addl -%d(%rbp), -%d(%rbp) \n",getRbpOffset($3),getRbpOffset($1));
     $$ = s_inc;
   }
   | var_ref MINUS_EQ var_ref
@@ -372,7 +369,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_inc,"\t subl %r%d, %r%d \n",$3,$1);
+    sprintf(s_inc,"\t subl -%d(%rbp), -%d(%rbp) \n",getRbpOffset($3),getRbpOffset($1));
     $$ = s_inc;
   }
   | RELAXOU OPEN_PAR var_ref CLOSE_PAR
@@ -383,7 +380,7 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_zero,"movl $0, %r%d\n",$3);
+    sprintf(s_zero,"movl $0, -%d(%rbp)\n",getRbpOffset($3));
     $$ = s_zero;
   }
   | FALATU OPEN_PAR var_ref CLOSE_PAR
@@ -395,8 +392,8 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       YYERROR;
     }
 		sprintf(s_print," \t movq $Sf, %rdi\n\t "
-											 "movl %r%d, %%esi\n\t "
-											 "call printf\n\n ",$3); 
+											 "movl -%d(%rbp), %%esi\n\t "
+											 "call printf\n\n ",getRbpOffset($3)); 
 
     $$ = s_print;
 

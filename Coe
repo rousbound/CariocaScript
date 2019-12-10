@@ -1,0 +1,10 @@
+#!/bin/sh
+cd src
+make -s
+cd ..
+./bin/cariocaScript $1 > temp.s
+echo CariocaScript 1.0 Copyright \(C\) 2019 PUC-Rio
+echo Falai meu consagrado, que que você manda?
+gcc -no-pie -o prog.out program/main.c temp.s && ./prog.out 
+mv temp.s program/temp.s
+mv prog.out program/prog.out

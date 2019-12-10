@@ -20,3 +20,7 @@
     va_end(va); 
 		return cs;
   }
+
+	int getRbpOffset(int symbol){
+		return 8+(symbol*8);
+	}
