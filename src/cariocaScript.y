@@ -200,12 +200,12 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
       YYERROR;
     }
 
-    sprintf(s_copia,"  \t movl $0,%%r12d\n"
+    sprintf(s_copia,"  \t movl $0,%%r13d\n"
 										"L%d:\n",label);
 
-    sprintf(s_inc,  "  \t addl $1,%%r12d \n");
+    sprintf(s_inc,  "  \t addl $1,%%r13d \n");
 
-    sprintf(s_if,   "  \t cmpl %%r12d,-%d(%rbp)\n" 
+    sprintf(s_if,   "  \t cmpl %%r13d,-%d(%rbp)\n" 
 								     " \t jne L%d \n",getRbpOffset($2),label);
 
     sprintf(s_exit,"\n",label);
@@ -353,13 +353,16 @@ cmd: MARCA var_ref RAPIDAO cmds VALEU
   | var_ref PLUS_EQ var_ref
   {
     char * s_inc = (char *) malloc(sizeof(char)*48);
-    if( !s_inc )
+    char * s_temp = (char *) malloc(sizeof(char)*48);
+    if( !s_inc || !s_temp )
     {
       yyerror(MEM_ERROR);
       YYERROR;
     }
-    sprintf(s_inc,"\t addl -%d(%rbp), -%d(%rbp) \n",getRbpOffset($3),getRbpOffset($1));
-    $$ = s_inc;
+    sprintf(s_temp,"\t movl -%d(%rbp), %%r12d \n",getRbpOffset($3));
+    sprintf(s_inc,"\t addl %%r12d, -%d(%rbp) \n",getRbpOffset($1));
+
+    $$ = concat(s_temp,s_inc);
   }
   | var_ref MINUS_EQ var_ref
   {

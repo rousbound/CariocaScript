@@ -15,7 +15,6 @@
 [ \t]         ;
 CHEGAMAIS         { return CHEGAMAIS; }
 NAMORAL             { return NAMORAL; }
-CAIFORA           { return CAIFORA; }
 VALEU             { return VALEU; }
 MARCA             { return MARCA; }
 RAPIDAO           { return RAPIDAO; }
@@ -31,15 +30,15 @@ FALATU           { return FALATU; }
 [a-zA-Z]+       {
   for( int i = 0 ; i < symtab_size ; i++ )
   {
-    if( !strcmp(symtab[i],yytext) )
+    if( !strcmp(symtab[i],yytext) ) //yytext é um ponteiro pra string encontrada
     {
-      yylval.ival = i;
+      yylval.ival = i; //yylval é o valor associado ao símbolo encontrado
       return ID;
     }
   }
   if( symtab_size == MAX_VAR_CNT )
   {
-    yylval.ival = -1; // Error!
+    yylval.ival = -1; 
   }
   else
   {
