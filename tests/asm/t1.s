@@ -29,23 +29,16 @@
 	 movq $Nl, %rdi
 	 call printf
 
-	 cmpl $0,-8(%rbp) 
-	 je L4
+	 	 movl -8(%rbp), %r12d 
+	 movl %r12d, -24(%rbp) 
   	 movl $0,%r13d
 L2:
   	 addl $1,%r13d 
- 	 cmpl $0,-8(%rbp) 
-	 je L1
-	 subl $1, -8(%rbp) 
-L1:
-	 addl $1, -24(%rbp) 
-  	 cmpl %r13d,-16(%rbp)
+	 movl -16(%rbp), %r12d 
+	 addl %r12d, -24(%rbp) 
+  	 cmpl %r13d,-8(%rbp)
  	 jne L2 
 
-	 jmp L5
-L4:
-	 addl $1, -8(%rbp) 
-L5:
  	 movq $Sf, %rdi
 	 movl -8(%rbp), %esi
 	 call printf
