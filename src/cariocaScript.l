@@ -30,10 +30,10 @@ FALATU           { return FALATU; }
 [a-zA-Z]+       {
   for( int i = 0 ; i < symtab_size ; i++ )
   {
-    if( !strcmp(symtab[i],yytext) ) //yytext é um ponteiro pra string encontrada
+    if( !strcmp(symtab[i],yytext) ) //yytext its a ponter to the matched string
     {
-      yylval.ival = i; //yylval é o valor associado ao símbolo encontrado
-      return ID;
+      yylval.ival = i; //yylval its the value associated with the symbol
+      return ID;//Found already registered ID
     }
   }
   if( symtab_size == MAX_VAR_CNT )
@@ -42,7 +42,7 @@ FALATU           { return FALATU; }
   }
   else
   {
-    symtab[symtab_size] = strdup(yytext);
+		symtab[symtab_size] = strdup(yytext); //Registering new ID, as strdup returns  a pointer to a new string which is a duplicate of the string s.
     yylval.ival = symtab_size;
  }
   return ID;
