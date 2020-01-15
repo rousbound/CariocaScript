@@ -14,6 +14,8 @@
   - [Arrancando os cabelos](#code-generation)
 - [Bibliografia](#bibliography)
 
+Primeiramente gostaria de agradecer enormemente ao projeto no qual baseei esse trabalho: 
+https://github.com/guidanoli/provolone
 ## Aquecendo os tambores - Instalando os pré-requisitos
 
 Para rodar o projeto é necessário ter os pacotes *Flex* e *Bison* instalados, o
